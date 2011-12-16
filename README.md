@@ -178,7 +178,7 @@ Credits
 -------
 
 * Kévin Gomez <kevin_gomez@carpe-hora.com>
-* [All contributors](https://github.com/willdurand/chSmsSender/contributors)
+* [All contributors](https://github.com/Carpe-Hora/chSmsSender/contributors)
 
 
 License
