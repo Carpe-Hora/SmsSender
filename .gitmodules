@@ -1,0 +1,6 @@
+[submodule "_layouts"]
+	path = _layouts
+	url = git://github.com/Carpe-Hora/chJekyll_layouts.git
+[submodule "_posts"]
+	path = _posts
+	url = git://github.com/Carpe-Hora/chJekyll_posts.git
