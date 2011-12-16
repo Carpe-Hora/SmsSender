@@ -139,13 +139,13 @@ Unit Tests
 To run unit tests, you'll need a set of dependencies you can install by
 running the `install_vendors.sh` script:
 
-```
+``` bash
 ./bin/install_vendors.sh
 ```
 
 Once installed, just launch the following command:
 
-```
+``` bash
 phpunit
 ```
 
