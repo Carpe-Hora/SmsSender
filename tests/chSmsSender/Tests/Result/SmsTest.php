@@ -20,21 +20,27 @@ class SmsTest extends TestCase
     public function testFromArray()
     {
         $array = array(
-            'id'    => '42sms42',
-            'sent'  => true,
+            'id'        => '42sms42',
+            'sent'      => true,
+            'recipient' => '0642424242',
+            'body'      => 'dummy message',
         );
 
         $this->sms->fromArray($array);
 
         $this->assertEquals('42sms42', $this->sms->getId());
         $this->assertTrue($this->sms->isSent());
+        $this->assertEquals('dummy message', $this->sms->getBody());
+        $this->assertEquals('0642424242', $this->sms->getRecipient());
     }
 
     public function testToArray()
     {
         $expected = array(
-            'id'    => '42foo42',
-            'sent'  => true
+            'id'        => '42foo42',
+            'sent'      => true,
+            'recipient' => '0642424242',
+            'body'      => 'dummy message',
         );
 
         $this->sms->fromArray($expected);
@@ -42,6 +48,8 @@ class SmsTest extends TestCase
 
         $this->assertEquals('42foo42', $result['id']);
         $this->assertTrue($result['sent']);
+        $this->assertEquals('dummy message', $result['body']);
+        $this->assertEquals('0642424242', $result['recipient']);
     }
 
     public function testFromDataWithEmptyArray()
@@ -50,24 +58,29 @@ class SmsTest extends TestCase
 
         $this->assertNull($this->sms->getId());
         $this->assertNull($this->sms->isSent());
+        $this->assertNull($this->sms->getBody());
+        $this->assertNull($this->sms->getRecipient());
     }
 
     public function testFromDataWithNull()
     {
         $array = array(
-            'sent'  => true
+            'sent'  => true,
+            'body'  => 'foo'
         );
 
         $this->sms->fromArray($array);
 
         $this->assertNull($this->sms->getId());
         $this->assertTrue($this->sms->isSent());
+        $this->assertNull($this->sms->getRecipient());
+        $this->assertEquals('foo', $this->sms->getBody());
     }
 
     public function testArrayInterface()
     {
         $array = array(
-            'id'      => '42foo42',
+            'id'    => '42foo42',
             'sent'  => true
         );
 

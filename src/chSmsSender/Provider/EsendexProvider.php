@@ -71,7 +71,10 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
             'type'      => 'Text',
         ));
 
-        return $this->executeQuery(self::SEND_SMS_URL, $params);
+        return $this->executeQuery(self::SEND_SMS_URL, $params, array(
+            'recipient' => $recipient,
+            'body'      => $body
+        ));
     }
 
     /**
@@ -105,7 +108,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
      * @param string $query
      * @return array
      */
-    protected function executeQuery($url, array $data = array())
+    protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
     {
         $content = $this->getAdapter()->getContent($url, 'POST', $headers = array(), $data);
 
@@ -113,7 +116,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
             return $this->getDefaults();
         }
 
-        return $this->parseResults($content);
+        return $this->parseResults($content, $extra_result_data);
     }
 
     /**
@@ -138,7 +141,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
      * @param string $result The raw result string.
      * @return array
      */
-    protected function parseResults($result)
+    protected function parseResults($result, array $extra_result_data = array())
     {
         // the data sent by the API looks like this
         //  Result=OK
@@ -174,7 +177,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
             unset($data['MessageIDs']);
         }
 
-        return array_merge($this->getDefaults(), $data);
+        return array_merge($this->getDefaults(), $data, $extra_result_data);
     }
 }
 

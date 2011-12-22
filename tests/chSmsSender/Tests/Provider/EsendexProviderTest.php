@@ -35,6 +35,8 @@ class EsendexProviderTest extends TestCase
 
         $this->assertNull($result['id']);
         $this->assertNull($result['sent']);
+        $this->assertEquals('0642424242', $result['recipient']);
+        $this->assertEquals('foo', $result['body']);
     }
 
     public function testSendWithMockData()
@@ -48,6 +50,8 @@ EOF;
 
         $this->assertEquals('3c13bbba-a9c2-460c-961b-4d6772960af0', $result['id']);
         $this->assertTrue($result['sent']);
+        $this->assertEquals('0642424242', $result['recipient']);
+        $this->assertEquals('foo', $result['body']);
     }
 
     public function testSendWithNullPhone()
@@ -57,6 +61,8 @@ EOF;
 
         $this->assertNull($result['id']);
         $this->assertNull($result['sent']);
+        $this->assertNull($result['recipient']);
+        $this->assertEquals('foo', $result['body']);
     }
 
     public function testSendWithNullMessage()
@@ -66,6 +72,8 @@ EOF;
 
         $this->assertNull($result['id']);
         $this->assertNull($result['sent']);
+        $this->assertEquals('0642424242', $result['recipient']);
+        $this->assertNull($result['body']);
     }
 
     public function testSendWithEmptyPhone()
@@ -75,6 +83,8 @@ EOF;
 
         $this->assertNull($result['id']);
         $this->assertNull($result['sent']);
+        $this->assertEquals('', $result['recipient']);
+        $this->assertEquals('foo', $result['body']);
     }
 
     public function testSendWithEmptyMessage()
@@ -84,6 +94,8 @@ EOF;
 
         $this->assertNull($result['id']);
         $this->assertNull($result['sent']);
+        $this->assertEquals('0642424242', $result['recipient']);
+        $this->assertEquals('', $result['body']);
     }
 /*
     public function testSendForReal()

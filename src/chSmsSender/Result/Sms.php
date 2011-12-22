@@ -25,6 +25,16 @@ class Sms implements ResultInterface, \ArrayAccess
      */
     protected $sent = null;
 
+    /**
+     * @var string
+     */
+    protected $recipient = null;
+
+    /**
+     * @var string
+     */
+    protected $body = null;
+
 
     /**
      * {@inheritDoc}
@@ -45,13 +55,38 @@ class Sms implements ResultInterface, \ArrayAccess
     /**
      * {@inheritDoc}
      */
+    public function getRecipient()
+    {
+        return $this->recipient;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function fromArray(array $data = array())
     {
         if (!empty($data['id'])) {
             $this->id = (string) $data['id'];
         }
+
         if (isset($data['sent'])) {
             $this->sent = (bool) $data['sent'];
+        }
+
+        if (isset($data['recipient'])) {
+            $this->recipient = (string) $data['recipient'];
+        }
+
+        if (isset($data['body'])) {
+            $this->body = (string) $data['body'];
         }
     }
 
@@ -61,8 +96,10 @@ class Sms implements ResultInterface, \ArrayAccess
     public function toArray()
     {
         return array(
-            'id'    => $this->id,
-            'sent'  => $this->sent,
+            'id'        => $this->id,
+            'sent'      => $this->sent,
+            'recipient' => $this->recipient,
+            'body'      => $this->body,
         );
     }
 

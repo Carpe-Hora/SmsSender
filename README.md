@@ -96,8 +96,10 @@ the name of the originator.
 
 $result = $sender->send('0642424242', 'It\'s the answer.', 'Kévin');
 // Result is:
-// "id"       => string(7) "some Id"
-// "sent"     => bool "true"
+// "id"        => string(7) "some Id"
+// "sent"      => bool "true"
+// "recipient" => string(10) "0642424242"
+// "body"      => string(17) "It's the answer."
 ```
 
 The `send()` method returns a `Sms` result object with the following API, this
@@ -105,6 +107,8 @@ object also implements the `ArrayAccess` interface:
 
 * `getId()` will return the `id`;
 * `isSent()` boolean indicating if the sms was sent;
+* `getRecipient()` string representing the recipient's phone number;
+* `getBody()` the message, as sent by the provider;
 
 The chSmsSender's API is fluent, you can write:
 

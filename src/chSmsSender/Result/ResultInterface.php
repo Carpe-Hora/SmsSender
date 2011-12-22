@@ -30,6 +30,20 @@ interface ResultInterface
     function getId();
 
     /**
+     * Returns the sms recipient.
+     *
+     * @return string
+     */
+    function getRecipient();
+
+    /**
+     * Returns the sms body.
+     *
+     * @return string
+     */
+    function getBody();
+
+    /**
      * Extracts data from an array.
      *
      * @param array $data   An array.
