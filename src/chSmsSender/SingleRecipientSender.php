@@ -46,10 +46,28 @@ class SingleRecipientSender implements SmsSenderInterface
      */
     public function send($recipient, $body, $originator = '')
     {
-        $result = $this->smsSender->send($this->recipient, $body, $originator);
+        $result = $this->getSmsSender()->send($this->recipient, $body, $originator);
         $result['recipient'] = $recipient;
 
         return $result;
+    }
+
+    /**
+     * @return \chSmsSender\SmsSenderInterface
+     */
+    public function getSmsSender()
+    {
+        return $this->smsSender;
+    }
+
+    /**
+     * Allows to proxy method calls to the real SMS sender.
+     */
+    public function __call($name, $arguments)
+    {
+        if (is_callable(array($this->smsSender, $name))) {
+            return call_user_func(array($this->smsSender, $name), $arguments);
+        }
     }
 }
 
