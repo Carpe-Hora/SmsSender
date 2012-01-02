@@ -126,6 +126,45 @@ with multiple adapters, you may want to choose one of them. The default
 behavior is to use the first one but it can be annoying.
 
 
+Single Recipient Strategy
+-------------------------
+
+Sometimes you want to configure a single recipient strategy in the development environment
+to avoid sending SMS to real users, but still allow the developer to check the rendered message
+in an SMS reader.
+
+By using the `SingleRecipientSender`, you'll be able to send your SMS without any other changes
+thanks to the decorator pattern. Just pass your in-use sender (`chSmsSender` for instance) and
+a recipient phonenumber, and you're done.
+
+``` php
+<?php
+
+$sender = new \chSmsSender\chSmsSender();
+$sender->registerProviders(array(
+    new \chSmsSender\Provider\EsendexProvider(
+        $adapter, '<ESENDEX_USER>', '<ESENDEX_PASS>', '<ESENDEX_ACCOUNT>'
+    ),
+    new \chSmsSender\Provider\OtherProvider($adapter)
+));
+
+$singleRecipientSender = new \chSmsSender\SingleRecipientSender($sender, '0601010101');
+```
+
+All SMS now will be sent to `0601010101`, but in a transparent way:
+
+``` php
+<?php
+
+$result = $singleRecipientSender>send('0642424242', 'It\'s the answer.', 'Kévin');
+// Result is:
+// "id"        => string(7) "some Id"
+// "sent"      => bool "true"
+// "recipient" => string(10) "0642424242" <== The recipient phonenumber is not the single recipient one :)
+// "body"      => string(17) "It's the answer."
+```
+
+
 Extending Things
 ----------------
 
