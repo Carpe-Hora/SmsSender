@@ -8,23 +8,14 @@
  * @see https://wiki.php.net/rfc/splclassloader#example_implementation
  */
 spl_autoload_register(function($className) {
+    $package = 'chSmsSender';
     $className = ltrim($className, '\\');
-    if (0 != strpos($className, 'chSmsSender')) {
-        return false;
+    if (0 === strpos($className, $package)) {
+        $fileName = __DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
+        if (is_file($fileName)) {
+            require $fileName;
+            return true;
+        }
     }
-    $fileName = '';
-    $namespace = '';
-    if ($lastNsPos = strrpos($className, '\\')) {
-        $namespace = substr($className, 0, $lastNsPos);
-        $className = substr($className, $lastNsPos + 1);
-        $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
-    }
-    $fileName = __DIR__ . DIRECTORY_SEPARATOR . $fileName . $className . '.php';
-    if (is_file($fileName)) {
-        require $fileName;
-
-        return true;
-    }
-
     return false;
 });
