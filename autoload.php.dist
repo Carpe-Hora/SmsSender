@@ -6,7 +6,7 @@ if (!class_exists('\Symfony\Component\ClassLoader\UniversalClassLoader')) {
 
 $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
 $loader->registerNamespaces(array(
-    'chSmsSender\Tests'    => __DIR__ . '/tests',
+    'SmsSender\Tests'   => __DIR__ . '/tests',
     'Symfony\Component' => __DIR__ . '/vendor',
     'Buzz'              => __DIR__ . '/vendor/Buzz/lib',
 ));

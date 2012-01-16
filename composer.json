@@ -1,9 +1,9 @@
 {
-    "name": "Carpe-Hora/chSmsSender",
+    "name": "Carpe-Hora/SmsSender",
     "type": "library",
-    "description": "The almost missing Sms sending PHP 5.3 library.",
+    "description": "The almost missing SMS sending PHP 5.3 library.",
     "keywords": ["sms", "abstraction"],
-    "homepage": "http://github.com/Carpe-Hora/chSmsSender",
+    "homepage": "http://github.com/Carpe-Hora/SmsSender",
     "license": "MIT",
     "authors": [
         {
@@ -19,6 +19,6 @@
         "ext-curl": "*"
     },
     "autoload": {
-        "psr-0": { "chSmsSender": "src/" }
+        "psr-0": { "SmsSender": "src/" }
     }
 }

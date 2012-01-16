@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This file is part of the chSmsSender package.
+ * This file is part of the SmsSender package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license    MIT License
  */
 
-namespace chSmsSender;
+namespace SmsSender;
 
-use chSmsSender\Provider\ProviderInterface;
-use chSmsSender\Result\Sms;
+use SmsSender\Provider\ProviderInterface;
+use SmsSender\Result\Sms;
 
 /**
  * Allows to configure a single recipient strategy.
@@ -21,7 +21,7 @@ use chSmsSender\Result\Sms;
 class SingleRecipientSender implements SmsSenderInterface
 {
     /**
-     * @var \chSmsSender\SmsSenderInterface
+     * @var \SmsSender\SmsSenderInterface
      */
     private $smsSender;
 
@@ -31,7 +31,7 @@ class SingleRecipientSender implements SmsSenderInterface
     private $recipient;
 
     /**
-     * @param \chSmsSender\SmsSenderInterface $smsSender An instance of SmsSenderInterface
+     * @param \SmsSender\SmsSenderInterface $smsSender An instance of SmsSenderInterface
      *                                                      to decorate with a single recipient strategy.
      * @param string $recipient Recipient phonenumber.
      */
@@ -53,7 +53,7 @@ class SingleRecipientSender implements SmsSenderInterface
     }
 
     /**
-     * @return \chSmsSender\SmsSenderInterface
+     * @return \SmsSender\SmsSenderInterface
      */
     public function getSmsSender()
     {

@@ -1,10 +1,10 @@
 <?php
 
-namespace chSmsSender\Tests\HttpAdapter;
+namespace SmsSender\Tests\HttpAdapter;
 
-use chSmsSender\Tests\TestCase;
+use SmsSender\Tests\TestCase;
 
-use chSmsSender\HttpAdapter\BuzzHttpAdapter;
+use SmsSender\HttpAdapter\BuzzHttpAdapter;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>

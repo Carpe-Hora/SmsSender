@@ -1,11 +1,11 @@
 <?php
 
-namespace chSmsSender\Tests\Provider;
+namespace SmsSender\Tests\Provider;
 
-use chSmsSender\Tests\TestCase;
+use SmsSender\Tests\TestCase;
 
-use chSmsSender\HttpAdapter\HttpAdapterInterface;
-use chSmsSender\Provider\AbstractProvider;
+use SmsSender\HttpAdapter\HttpAdapterInterface;
+use SmsSender\Provider\AbstractProvider;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>

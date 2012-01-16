@@ -1,14 +1,14 @@
 <?php
 
 /**
- * This file is part of the chSmsSender package.
+ * This file is part of the SmsSender package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license    MIT License
  */
 
-namespace chSmsSender\Result;
+namespace SmsSender\Result;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>

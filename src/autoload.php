@@ -8,7 +8,7 @@
  * @see https://wiki.php.net/rfc/splclassloader#example_implementation
  */
 spl_autoload_register(function($className) {
-    $package = 'chSmsSender';
+    $package = 'SmsSender';
     $className = ltrim($className, '\\');
     if (0 === strpos($className, $package)) {
         $fileName = __DIR__ . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';

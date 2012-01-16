@@ -1,9 +1,9 @@
 <?php
 
-namespace chSmsSender\Tests;
+namespace SmsSender\Tests;
 
-use chSmsSender\Result\Sms;
-use chSmsSender\SingleRecipientSender;
+use SmsSender\Result\Sms;
+use SmsSender\SingleRecipientSender;
 
 /**
  * @author William Durand <william.durand1@gmail.com>
@@ -32,7 +32,7 @@ class SingleRecipientSenderTest extends TestCase
 
         $sms = $sender->send($realRecipient, $body);
 
-        $this->assertInstanceOf('\chSmsSender\Result\ResultInterface', $sms);
+        $this->assertInstanceOf('\SmsSender\Result\ResultInterface', $sms);
         $this->assertSame($result, $sms, 'Ensures there is a unique result object');
         $this->assertEquals($body, $sms->getBody(), 'The body should be the same');
         $this->assertEquals($realRecipient, $sms->getRecipient(), 'Recipient should be modified to show the real recipient number');
@@ -41,7 +41,7 @@ class SingleRecipientSenderTest extends TestCase
 
     private function getSenderMock($singleRecipient, $result)
     {
-        $mock = $this->getMock('\chSmsSender\SmsSenderInterface');
+        $mock = $this->getMock('\SmsSender\SmsSenderInterface');
         $mock
             ->expects($this->once())
             ->method('send')

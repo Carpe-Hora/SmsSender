@@ -1,22 +1,22 @@
 <?php
 
 /**
- * This file is part of the chSmsSender package.
+ * This file is part of the SmsSender package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license    MIT License
  */
 
-namespace chSmsSender;
+namespace SmsSender;
 
-use chSmsSender\Provider\ProviderInterface;
-use chSmsSender\Result\Sms;
+use SmsSender\Provider\ProviderInterface;
+use SmsSender\Result\Sms;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-class chSmsSender implements SmsSenderInterface
+class SmsSender implements SmsSenderInterface
 {
     /**
      * Version
@@ -29,13 +29,13 @@ class chSmsSender implements SmsSenderInterface
     protected $providers = array();
 
     /**
-     * @var \chSmsSender\Provider\ProviderInterface
+     * @var \SmsSender\Provider\ProviderInterface
      */
     protected $provider = null;
 
 
     /**
-     * @param \chSmsSender\Provider\ProviderInterface $provider
+     * @param \SmsSender\Provider\ProviderInterface $provider
      */
     public function __construct(ProviderInterface $provider = null)
     {
@@ -61,8 +61,8 @@ class chSmsSender implements SmsSenderInterface
     /**
      * Registers a provider.
      *
-     * @param \chSmsSender\Provider\ProviderInterface $provider
-     * @return \chSmsSender\AbstractProvider
+     * @param \SmsSender\Provider\ProviderInterface $provider
+     * @return \SmsSender\AbstractProvider
      */
     public function registerProvider(ProviderInterface $provider)
     {
@@ -77,7 +77,7 @@ class chSmsSender implements SmsSenderInterface
      * Registers a set of providers.
      *
      * @param array $providers
-     * @return \chSmsSender\AbstractProvider
+     * @return \SmsSender\AbstractProvider
      */
     public function registerProviders(array $providers = array())
     {
@@ -92,7 +92,7 @@ class chSmsSender implements SmsSenderInterface
      * Sets the provider to use.
      *
      * @param string $name  A provider's name
-     * @return \chSmsSender\AbstractProvider
+     * @return \SmsSender\AbstractProvider
      */
     public function using($name)
     {
@@ -116,7 +116,7 @@ class chSmsSender implements SmsSenderInterface
     /**
      * Returns the provider to use.
      *
-     * @return \chSmsSender\Provider\ProviderInterface
+     * @return \SmsSender\Provider\ProviderInterface
      */
     protected function getProvider()
     {
@@ -133,7 +133,7 @@ class chSmsSender implements SmsSenderInterface
 
     /**
      * @param array $data   An array of data.
-     * @return \chSmsSender\Result\Sms
+     * @return \SmsSender\Result\Sms
      */
     protected function returnResult(array $data = array())
     {

@@ -1,10 +1,10 @@
 <?php
 
-namespace chSmsSender\Tests\HttpAdapter;
+namespace SmsSender\Tests\HttpAdapter;
 
-use chSmsSender\Tests\TestCase;
+use SmsSender\Tests\TestCase;
 
-use chSmsSender\HttpAdapter\CurlHttpAdapter;
+use SmsSender\HttpAdapter\CurlHttpAdapter;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>

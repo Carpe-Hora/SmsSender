@@ -1,6 +1,6 @@
 <?php
 
-namespace chSmsSender\Tests;
+namespace SmsSender\Tests;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
@@ -8,7 +8,7 @@ namespace chSmsSender\Tests;
 class TestCase extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \chSmsSender\HttpAdapter\HttpAdapterInterface
+     * @return \SmsSender\HttpAdapter\HttpAdapterInterface
      */
     protected function getMockAdapter($expects = null, $content = null)
     {
@@ -16,7 +16,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             $expects = $this->once();
         }
 
-        $mock = $this->getMock('\chSmsSender\HttpAdapter\HttpAdapterInterface');
+        $mock = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
         $mock
             ->expects($expects)
             ->method('getContent')

@@ -1,20 +1,20 @@
 <?php
 
-namespace chSmsSender\Tests;
+namespace SmsSender\Tests;
 
-use chSmsSender\chSmsSender;
-use chSmsSender\Provider\ProviderInterface;
+use SmsSender\SmsSender;
+use SmsSender\Provider\ProviderInterface;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-class chSmsSenderTest extends TestCase
+class SmsSenderTest extends TestCase
 {
     protected $sender;
 
     protected function setUp()
     {
-        $this->sender = new TestableChSmsSender();
+        $this->sender = new TestableSmsSender();
     }
 
     public function testRegisterProvider()
@@ -100,7 +100,7 @@ class chSmsSenderTest extends TestCase
     public function testSendReturnsInstanceOfSms()
     {
         $this->sender->registerProvider(new MockProvider('test1'));
-        $this->assertInstanceOf('\chSmsSender\Result\Sms', $this->sender->send('phone', 'message'));
+        $this->assertInstanceOf('\SmsSender\Result\Sms', $this->sender->send('phone', 'message'));
     }
 
     public function testEmpty()
@@ -152,7 +152,7 @@ class MockProviderWithRequestCount extends MockProvider
     }
 }
 
-class TestableChSmsSender extends chSmsSender
+class TestableSmsSender extends SmsSender
 {
     public $countCallGetProvider = 0;
 

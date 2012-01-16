@@ -1,10 +1,10 @@
 <?php
 
-namespace chSmsSender\Tests\Provider;
+namespace SmsSender\Tests\Provider;
 
-use chSmsSender\Tests\TestCase;
+use SmsSender\Tests\TestCase;
 
-use chSmsSender\Provider\EsendexProvider;
+use SmsSender\Provider\EsendexProvider;
 
 class EsendexProviderTest extends TestCase
 {
@@ -13,7 +13,7 @@ class EsendexProviderTest extends TestCase
      */
     public function testSendWithNullApiCredentials()
     {
-        $adapter = $this->getMock('\chSmsSender\HttpAdapter\HttpAdapterInterface');
+        $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
         $provider = new EsendexProvider($adapter, null, null, null);
         $provider->send('0642424242', 'foo!');
     }
@@ -23,7 +23,7 @@ class EsendexProviderTest extends TestCase
      */
     public function testGetStatusWithNullApiCredentials()
     {
-        $adapter = $this->getMock('\chSmsSender\HttpAdapter\HttpAdapterInterface');
+        $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
         $provider = new EsendexProvider($adapter, null, null, null);
         $provider->getStatus('dummyMessageId');
     }

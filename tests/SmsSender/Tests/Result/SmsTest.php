@@ -1,9 +1,9 @@
 <?php
 
-namespace chSmsSender\Tests\Result;
+namespace SmsSender\Tests\Result;
 
-use chSmsSender\Result\Sms;
-use chSmsSender\Tests\TestCase;
+use SmsSender\Result\Sms;
+use SmsSender\Tests\TestCase;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>

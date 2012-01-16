@@ -1,16 +1,16 @@
 <?php
 
 /**
- * This file is part of the chSmsSender package.
+ * This file is part of the SmsSender package.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * @license    MIT License
  */
 
-namespace chSmsSender\Provider;
+namespace SmsSender\Provider;
 
-use chSmsSender\HttpAdapter\HttpAdapterInterface;
+use SmsSender\HttpAdapter\HttpAdapterInterface;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
@@ -18,13 +18,13 @@ use chSmsSender\HttpAdapter\HttpAdapterInterface;
 abstract class AbstractProvider
 {
     /**
-     * @var \chSmsSender\HttpAdapter\HttpAdapterInterface
+     * @var \SmsSender\HttpAdapter\HttpAdapterInterface
      */
     protected $adapter = null;
 
 
     /**
-     * @param \chSmsSender\HttpAdapter\HttpAdapterInterface $adapter   An HTTP adapter.
+     * @param \SmsSender\HttpAdapter\HttpAdapterInterface $adapter   An HTTP adapter.
      */
     public function __construct(HttpAdapterInterface $adapter)
     {
@@ -34,7 +34,7 @@ abstract class AbstractProvider
     /**
      * Returns the HTTP adapter.
      *
-     * @return \chSmsSender\HttpAdapter\HttpAdapterInterface
+     * @return \SmsSender\HttpAdapter\HttpAdapterInterface
      */
     protected function getAdapter()
     {
