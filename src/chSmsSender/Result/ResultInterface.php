@@ -44,6 +44,13 @@ interface ResultInterface
     function getBody();
 
     /**
+     * Returns the name of the person which sent the sms.
+     *
+     * @return string
+     */
+    function getOriginator();
+
+    /**
      * Extracts data from an array.
      *
      * @param array $data   An array.

@@ -66,14 +66,16 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
         }
 
         $params = $this->getParameters(array(
-            'recipient' => $recipient,
-            'body'      => $body,
-            'type'      => 'Text',
+            'recipient'  => $recipient,
+            'body'       => $body,
+            'originator' => $originator,
+            'type'       => 'Text',
         ));
 
         return $this->executeQuery(self::SEND_SMS_URL, $params, array(
-            'recipient' => $recipient,
-            'body'      => $body
+            'recipient'  => $recipient,
+            'body'       => $body,
+            'originator' => $originator,
         ));
     }
 

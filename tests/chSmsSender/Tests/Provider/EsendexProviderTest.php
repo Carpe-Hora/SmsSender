@@ -37,6 +37,7 @@ class EsendexProviderTest extends TestCase
         $this->assertNull($result['sent']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertEquals('foo', $result['body']);
+        $this->assertEmpty('', $result['originator']);
     }
 
     public function testSendWithMockData()
@@ -52,6 +53,23 @@ EOF;
         $this->assertTrue($result['sent']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertEquals('foo', $result['body']);
+        $this->assertEmpty('', $result['originator']);
+    }
+
+    public function testSendWithMockDataAndOriginator()
+    {
+        $data = <<<EOF
+Result=OK
+MessageIDs=3c13bbba-a9c2-460c-961b-4d6772960af0
+EOF;
+        $this->provider = new EsendexProvider($this->getMockAdapter(null, $data), 'username', 'pass', 'account');
+        $result = $this->provider->send('0642424242', 'foo', 'Superman');
+
+        $this->assertEquals('3c13bbba-a9c2-460c-961b-4d6772960af0', $result['id']);
+        $this->assertTrue($result['sent']);
+        $this->assertEquals('0642424242', $result['recipient']);
+        $this->assertEquals('foo', $result['body']);
+        $this->assertEquals('Superman', $result['originator']);
     }
 
     public function testSendWithNullPhone()
@@ -63,6 +81,7 @@ EOF;
         $this->assertNull($result['sent']);
         $this->assertNull($result['recipient']);
         $this->assertEquals('foo', $result['body']);
+        $this->assertEmpty('', $result['originator']);
     }
 
     public function testSendWithNullMessage()
@@ -74,6 +93,7 @@ EOF;
         $this->assertNull($result['sent']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertNull($result['body']);
+        $this->assertEmpty('', $result['originator']);
     }
 
     public function testSendWithEmptyPhone()
@@ -85,6 +105,7 @@ EOF;
         $this->assertNull($result['sent']);
         $this->assertEquals('', $result['recipient']);
         $this->assertEquals('foo', $result['body']);
+        $this->assertEmpty('', $result['originator']);
     }
 
     public function testSendWithEmptyMessage()
@@ -96,6 +117,7 @@ EOF;
         $this->assertNull($result['sent']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertEquals('', $result['body']);
+        $this->assertEmpty('', $result['originator']);
     }
 /*
     public function testSendForReal()

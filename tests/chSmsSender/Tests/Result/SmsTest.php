@@ -20,10 +20,11 @@ class SmsTest extends TestCase
     public function testFromArray()
     {
         $array = array(
-            'id'        => '42sms42',
-            'sent'      => true,
-            'recipient' => '0642424242',
-            'body'      => 'dummy message',
+            'id'         => '42sms42',
+            'sent'       => true,
+            'recipient'  => '0642424242',
+            'body'       => 'dummy message',
+            'originator' => 'Superman',
         );
 
         $this->sms->fromArray($array);
@@ -32,15 +33,17 @@ class SmsTest extends TestCase
         $this->assertTrue($this->sms->isSent());
         $this->assertEquals('dummy message', $this->sms->getBody());
         $this->assertEquals('0642424242', $this->sms->getRecipient());
+        $this->assertEquals('Superman', $this->sms->getOriginator());
     }
 
     public function testToArray()
     {
         $expected = array(
-            'id'        => '42foo42',
-            'sent'      => true,
-            'recipient' => '0642424242',
-            'body'      => 'dummy message',
+            'id'         => '42foo42',
+            'sent'       => true,
+            'recipient'  => '0642424242',
+            'body'       => 'dummy message',
+            'originator' => 'Superman',
         );
 
         $this->sms->fromArray($expected);
@@ -50,6 +53,7 @@ class SmsTest extends TestCase
         $this->assertTrue($result['sent']);
         $this->assertEquals('dummy message', $result['body']);
         $this->assertEquals('0642424242', $result['recipient']);
+        $this->assertEquals('Superman', $result['originator']);
     }
 
     public function testFromDataWithEmptyArray()
@@ -60,6 +64,7 @@ class SmsTest extends TestCase
         $this->assertNull($this->sms->isSent());
         $this->assertNull($this->sms->getBody());
         $this->assertNull($this->sms->getRecipient());
+        $this->assertNull($this->sms->getOriginator());
     }
 
     public function testFromDataWithNull()
@@ -75,6 +80,7 @@ class SmsTest extends TestCase
         $this->assertTrue($this->sms->isSent());
         $this->assertNull($this->sms->getRecipient());
         $this->assertEquals('foo', $this->sms->getBody());
+        $this->assertNull($this->sms->getOriginator());
     }
 
     public function testArrayInterface()
