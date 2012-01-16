@@ -115,6 +115,8 @@ object also implements the `ArrayAccess` interface:
 
 * `getId()` will return the `id`;
 * `isSent()` boolean indicating if the sms was sent;
+* `getStatus()` boolean indicating the sms' status (see the ResultInterface
+  interface for the full statuses list);
 * `getRecipient()` string representing the recipient's phone number;
 * `getBody()` the message, as sent by the provider;
 
