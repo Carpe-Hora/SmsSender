@@ -117,7 +117,7 @@ class SmsSenderTest extends TestCase
     protected function assertEmptyResult($result)
     {
         $this->assertNull($result->getId());
-        $this->assertNull($result->isSent());
+        $this->assertFalse($result->isSent());
     }
 }
 

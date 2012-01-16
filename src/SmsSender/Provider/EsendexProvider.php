@@ -12,6 +12,7 @@ namespace SmsSender\Provider;
 
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Provider\ProviderInterface;
+use SmsSender\Result\ResultInterface;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
@@ -170,7 +171,9 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
 
         // and now, clean a bit the data
         if (isset($data['Result'])) {
-            $data['sent'] = $data['Result'] == 'OK';
+            $data['status'] = $data['Result'] == 'OK'
+                ? ResultInterface::STATUS_SENT
+                : ResultInterface::STATUS_FAILED;
             unset($data['Success']);
         }
 

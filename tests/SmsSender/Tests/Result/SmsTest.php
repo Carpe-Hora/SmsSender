@@ -3,6 +3,7 @@
 namespace SmsSender\Tests\Result;
 
 use SmsSender\Result\Sms;
+use SmsSender\Result\ResultInterface;
 use SmsSender\Tests\TestCase;
 
 /**
@@ -21,7 +22,7 @@ class SmsTest extends TestCase
     {
         $array = array(
             'id'         => '42sms42',
-            'sent'       => true,
+            'status'     => ResultInterface::STATUS_SENT,
             'recipient'  => '0642424242',
             'body'       => 'dummy message',
             'originator' => 'Superman',
@@ -31,6 +32,7 @@ class SmsTest extends TestCase
 
         $this->assertEquals('42sms42', $this->sms->getId());
         $this->assertTrue($this->sms->isSent());
+        $this->assertEquals(ResultInterface::STATUS_SENT, $this->sms->getStatus());
         $this->assertEquals('dummy message', $this->sms->getBody());
         $this->assertEquals('0642424242', $this->sms->getRecipient());
         $this->assertEquals('Superman', $this->sms->getOriginator());
@@ -40,7 +42,7 @@ class SmsTest extends TestCase
     {
         $expected = array(
             'id'         => '42foo42',
-            'sent'       => true,
+            'status'     => ResultInterface::STATUS_SENT,
             'recipient'  => '0642424242',
             'body'       => 'dummy message',
             'originator' => 'Superman',
@@ -51,6 +53,7 @@ class SmsTest extends TestCase
 
         $this->assertEquals('42foo42', $result['id']);
         $this->assertTrue($result['sent']);
+        $this->assertEquals(ResultInterface::STATUS_SENT, $result['status']);
         $this->assertEquals('dummy message', $result['body']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertEquals('Superman', $result['originator']);
@@ -61,7 +64,8 @@ class SmsTest extends TestCase
         $this->sms->fromArray(array());
 
         $this->assertNull($this->sms->getId());
-        $this->assertNull($this->sms->isSent());
+        $this->assertFalse($this->sms->isSent());
+        $this->assertNull($this->sms->getStatus());
         $this->assertNull($this->sms->getBody());
         $this->assertNull($this->sms->getRecipient());
         $this->assertNull($this->sms->getOriginator());
@@ -70,14 +74,15 @@ class SmsTest extends TestCase
     public function testFromDataWithNull()
     {
         $array = array(
-            'sent'  => true,
-            'body'  => 'foo'
+            'status'  => ResultInterface::STATUS_SENT,
+            'body'    => 'foo'
         );
 
         $this->sms->fromArray($array);
 
         $this->assertNull($this->sms->getId());
         $this->assertTrue($this->sms->isSent());
+        $this->assertEquals(ResultInterface::STATUS_SENT, $this->sms->getStatus());
         $this->assertNull($this->sms->getRecipient());
         $this->assertEquals('foo', $this->sms->getBody());
         $this->assertNull($this->sms->getOriginator());
@@ -86,23 +91,23 @@ class SmsTest extends TestCase
     public function testArrayInterface()
     {
         $array = array(
-            'id'    => '42foo42',
-            'sent'  => true
+            'id'      => '42foo42',
+            'status'  => ResultInterface::STATUS_FAILED
         );
 
         $this->sms->fromArray($array);
 
         // array access
         $this->assertEquals('42foo42', $this->sms['id']);
-        $this->assertTrue($this->sms['sent']);
+        $this->assertEquals(ResultInterface::STATUS_FAILED, $this->sms['status']);
 
         // array access is case independant
         $this->assertEquals('42foo42', $this->sms['ID']);
-        $this->assertTrue($this->sms['SENT']);
+        $this->assertEquals(ResultInterface::STATUS_FAILED, $this->sms['STATUS']);
 
         // isset
         $this->assertTrue(isset($this->sms['id']));
-        $this->assertTrue(isset($this->sms['sent']));
+        $this->assertTrue(isset($this->sms['status']));
         $this->assertFalse(isset($this->sms['other']));
 
         // set

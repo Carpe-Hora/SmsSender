@@ -21,11 +21,6 @@ class Sms implements ResultInterface, \ArrayAccess
     protected $id = null;
 
     /**
-     * @var boolean
-     */
-    protected $sent = null;
-
-    /**
      * @var string
      */
     protected $recipient = null;
@@ -39,6 +34,11 @@ class Sms implements ResultInterface, \ArrayAccess
      * @var string
      */
     protected $originator = null;
+
+    /**
+     * @var string
+     */
+    protected $status = null;
 
 
     /**
@@ -54,7 +54,8 @@ class Sms implements ResultInterface, \ArrayAccess
      */
     public function isSent()
     {
-        return $this->sent;
+        return $this->status === ResultInterface::STATUS_DELIVERED
+            || $this->status === ResultInterface::STATUS_SENT;
     }
 
     /**
@@ -84,14 +85,18 @@ class Sms implements ResultInterface, \ArrayAccess
     /**
      * {@inheritDoc}
      */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function fromArray(array $data = array())
     {
         if (!empty($data['id'])) {
             $this->id = (string) $data['id'];
-        }
-
-        if (isset($data['sent'])) {
-            $this->sent = (bool) $data['sent'];
         }
 
         if (isset($data['recipient'])) {
@@ -105,6 +110,14 @@ class Sms implements ResultInterface, \ArrayAccess
         if (isset($data['originator'])) {
             $this->originator = (string) $data['originator'];
         }
+
+        if (isset($data['status'])) {
+            if (!in_array($data['status'], $this->getValidStatus())) {
+                throw new \RuntimeException(sprintf('Invalid status given: "%s"', $data['status']));
+            }
+
+            $this->status = (string) $data['status'];
+        }
     }
 
     /**
@@ -114,10 +127,26 @@ class Sms implements ResultInterface, \ArrayAccess
     {
         return array(
             'id'         => $this->id,
-            'sent'       => $this->sent,
             'recipient'  => $this->recipient,
             'body'       => $this->body,
             'originator' => $this->originator,
+            'status'     => $this->status,
+            'sent'       => $this->isSent(),
+        );
+    }
+
+    /**
+     * Returns a list of the valid status.
+     *
+     * @return array
+     * @author Kevin Gomez <kevin_gomez@carpe-hora.com>
+     */
+    public function getValidStatus()
+    {
+        return array(
+            ResultInterface::STATUS_SENT,
+            ResultInterface::STATUS_DELIVERED,
+            ResultInterface::STATUS_FAILED,
         );
     }
 

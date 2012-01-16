@@ -6,6 +6,7 @@ use SmsSender\Tests\TestCase;
 
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Provider\AbstractProvider;
+use SmsSender\Result\ResultInterface;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
@@ -28,7 +29,7 @@ class AbstractProviderTest extends TestCase
 
         $this->assertEquals(2, count($result));
         $this->assertNull($result['id']);
-        $this->assertNull($result['sent']);
+        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
     }
 }
 

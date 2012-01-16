@@ -11,6 +11,7 @@
 namespace SmsSender\Provider;
 
 use SmsSender\HttpAdapter\HttpAdapterInterface;
+use SmsSender\Result\ResultInterface;
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
@@ -50,7 +51,7 @@ abstract class AbstractProvider
     {
         return array(
             'id'     => null,
-            'sent'   => null,
+            'status' => ResultInterface::STATUS_FAILED
         );
     }
 }

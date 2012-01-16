@@ -1,3 +1,10 @@
+---
+layout: default
+title: chSmsSender
+github_url: http://github.com/Carpe-Hora/chSmsSender
+date: 2012-01-16
+---
+
 SmsSender
 ========
 
@@ -35,11 +42,11 @@ Installation
 If you don't use a _ClassLoader_ in your application, just require the provided
 autoloader:
 
-``` php
+{% highlight php %}
 <?php
 
 require_once 'src/autoload.php';
-```
+{% endhighlight %}
 
 You're done.
 
@@ -49,21 +56,21 @@ Usage
 
 First, you need an `adapter` to query an API:
 
-``` php
+{% highlight php %}
 <?php
 
 $adapter  = new \SmsSender\HttpAdapter\BuzzHttpAdapter();
-```
+{% endhighlight %}
 
 The `BuzzHttpAdapter` is tweakable, actually you can pass a `Browser` object
 to this adapter:
 
-``` php
+{% highlight php %}
 <?php
 
 $buzz    = new \Buzz\Browser(new \Buzz\Client\Curl());
 $adapter = new \SmsSender\HttpAdapter\BuzzHttpAdapter($buzz);
-```
+{% endhighlight %}
 
 Now, you have to choose your `provider`.
 
@@ -71,7 +78,7 @@ You can use one of the builtin providers or write your own. You can also
 register all providers and decide later.
 That's we'll do:
 
-``` php
+{% highlight php %}
 <?php
 
 $sender = new \SmsSender\SmsSender();
@@ -81,7 +88,7 @@ $sender->registerProviders(array(
     ),
     new \SmsSender\Provider\OtherProvider($adapter)
 ));
-```
+{% endhighlight %}
 
 Everything is ok, enjoy!
 
@@ -91,17 +98,16 @@ API
 The main method is called `send()` which receives a phone number, a message and
 the name of the originator.
 
-``` php
+{% highlight php %}
 <?php
 
 $result = $sender->send('0642424242', 'It\'s the answer.', 'Kévin');
 // Result is:
 // "id"        => string(7) "some Id"
 // "sent"      => bool "true"
-// "status"    => string(9) "delivered"
 // "recipient" => string(10) "0642424242"
 // "body"      => string(17) "It's the answer."
-```
+{% endhighlight %}
 
 The `send()` method returns a `Sms` result object with the following API, this
 object also implements the `ArrayAccess` interface:
@@ -113,14 +119,14 @@ object also implements the `ArrayAccess` interface:
 
 The SmsSender's API is fluent, you can write:
 
-``` php
+{% highlight php %}
 <?php
 
 $result = $sender
     ->registerProvider(new \My\Provider\Custom($adapter))
     ->using('custom')
     ->send('0642424242', 'It\'s the answer.', 'Kévin');
-```
+{% endhighlight %}
 
 The `using()` method allows you to choose the `adapter` to use. When you deal
 with multiple adapters, you may want to choose one of them. The default
@@ -138,7 +144,7 @@ By using the `SingleRecipientSender`, you'll be able to send your SMS without an
 thanks to the decorator pattern. Just pass your in-use sender (`chSmsSender` for instance) and
 a recipient phonenumber, and you're done.
 
-``` php
+{% highlight php %}
 <?php
 
 $sender = new \chSmsSender\chSmsSender();
@@ -150,21 +156,20 @@ $sender->registerProviders(array(
 ));
 
 $singleRecipientSender = new \chSmsSender\SingleRecipientSender($sender, '0601010101');
-```
+{% endhighlight %}
 
 All SMS now will be sent to `0601010101`, but in a transparent way:
 
-``` php
+{% highlight php %}
 <?php
 
 $result = $singleRecipientSender>send('0642424242', 'It\'s the answer.', 'Kévin');
 // Result is:
 // "id"        => string(7) "some Id"
 // "sent"      => bool "true"
-// "status"    => string(9) "delivered"
 // "recipient" => string(10) "0642424242" <== The recipient phonenumber is not the single recipient one :)
 // "body"      => string(17) "It's the answer."
-```
+{% endhighlight %}
 
 
 Extending Things
@@ -184,28 +189,28 @@ Unit Tests
 To run unit tests, you'll need a set of dependencies you can install by
 running the `install_vendors.sh` script:
 
-``` bash
+{% highlight bash %}
 ./bin/install_vendors.sh
-```
+{% endhighlight %}
 
 Once installed, just launch the following command:
 
-``` bash
+{% highlight bash %}
 phpunit
-```
+{% endhighlight %}
 
 You'll obtain some _skipped_ unit tests due to the need of API keys.
 
 Rename the `phpunit.xml.dist` file to `phpunit.xml`, then uncomment the
 following lines and add your own API keys:
 
-``` xml
+{% highlight xml %}
 <php>
     <!-- <server name="ESENDEX_API_USER" value="Your esendex user" /> -->
     <!-- <server name="ESENDEX_API_PASS" value="Your esendex password" /> -->
     <!-- <server name="ESENDEX_API_ACCOUNT" value="Your esendex account reference" /> -->
 </php>
-```
+{% endhighlight %}
 
 You're done.
 

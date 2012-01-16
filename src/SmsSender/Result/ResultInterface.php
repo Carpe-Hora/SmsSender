@@ -16,6 +16,22 @@ namespace SmsSender\Result;
 interface ResultInterface
 {
     /**
+     * The message was received by the provider, and sent to the mobile phone.
+     */
+    const STATUS_SENT = 'sent';
+
+    /**
+     * The message was sent by the provider and delivered to the mobile phone.
+     */
+    const STATUS_DELIVERED = 'delivered';
+
+    /**
+     * The provider failed to send the message.
+     */
+    const STATUS_FAILED = 'failed';
+
+
+    /**
      * Tells if the sms was sent.
      *
      * @return bool
