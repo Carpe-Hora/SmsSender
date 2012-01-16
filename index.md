@@ -105,6 +105,7 @@ $result = $sender->send('0642424242', 'It\'s the answer.', 'Kévin');
 // Result is:
 // "id"        => string(7) "some Id"
 // "sent"      => bool "true"
+// "status"    => string(9) "delivered"
 // "recipient" => string(10) "0642424242"
 // "body"      => string(17) "It's the answer."
 {% endhighlight %}
@@ -167,6 +168,7 @@ $result = $singleRecipientSender>send('0642424242', 'It\'s the answer.', 'Kévin
 // Result is:
 // "id"        => string(7) "some Id"
 // "sent"      => bool "true"
+// "status"    => string(9) "delivered"
 // "recipient" => string(10) "0642424242" <== The recipient phonenumber is not the single recipient one :)
 // "body"      => string(17) "It's the answer."
 {% endhighlight %}
