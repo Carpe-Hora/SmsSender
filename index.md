@@ -2,19 +2,19 @@
 layout: default
 title: chSmsSender
 github_url: http://github.com/Carpe-Hora/chSmsSender
-date: 2011-12-22
+date: 2012-01-16
 ---
 
-chSmsSender
+SmsSender
 ========
 
-**chSmsSender** is a library which helps you send SMS through your web applications.
+**SmsSender** is a library which helps you send SMS through your web applications.
 It provides an abstraction layer for sms manipulations.
 The library is splitted in two parts: `HttpAdapter` and `Provider` and is
 really extensible.
 
 [![Build
-Status](https://secure.travis-ci.org/Carpe-Hora/chSmsSender.png)](http://travis-ci.org/Carpe-Hora/chSmsSender)
+Status](https://secure.travis-ci.org/Carpe-Hora/SmsSender.png)](http://travis-ci.org/Carpe-Hora/SmsSender)
 
 
 ### HttpAdapters ###
@@ -59,7 +59,7 @@ First, you need an `adapter` to query an API:
 {% highlight php %}
 <?php
 
-$adapter  = new \chSmsSender\HttpAdapter\BuzzHttpAdapter();
+$adapter  = new \SmsSender\HttpAdapter\BuzzHttpAdapter();
 {% endhighlight %}
 
 The `BuzzHttpAdapter` is tweakable, actually you can pass a `Browser` object
@@ -69,7 +69,7 @@ to this adapter:
 <?php
 
 $buzz    = new \Buzz\Browser(new \Buzz\Client\Curl());
-$adapter = new \chSmsSender\HttpAdapter\BuzzHttpAdapter($buzz);
+$adapter = new \SmsSender\HttpAdapter\BuzzHttpAdapter($buzz);
 {% endhighlight %}
 
 Now, you have to choose your `provider`.
@@ -81,12 +81,12 @@ That's we'll do:
 {% highlight php %}
 <?php
 
-$sender = new \chSmsSender\chSmsSender();
+$sender = new \SmsSender\SmsSender();
 $sender->registerProviders(array(
-    new \chSmsSender\Provider\EsendexProvider(
+    new \SmsSender\Provider\EsendexProvider(
         $adapter, '<ESENDEX_USER>', '<ESENDEX_PASS>', '<ESENDEX_ACCOUNT>'
     ),
-    new \chSmsSender\Provider\OtherProvider($adapter)
+    new \SmsSender\Provider\OtherProvider($adapter)
 ));
 {% endhighlight %}
 
@@ -117,7 +117,7 @@ object also implements the `ArrayAccess` interface:
 * `getRecipient()` string representing the recipient's phone number;
 * `getBody()` the message, as sent by the provider;
 
-The chSmsSender's API is fluent, you can write:
+The SmsSender's API is fluent, you can write:
 
 {% highlight php %}
 <?php
@@ -189,10 +189,10 @@ Credits
 -------
 
 * Kévin Gomez <kevin_gomez@carpe-hora.com>
-* [All contributors](https://github.com/Carpe-Hora/chSmsSender/contributors)
+* [All contributors](https://github.com/Carpe-Hora/SmsSender/contributors)
 
 
 License
 -------
 
-chSmsSender is released under the MIT License. See the bundled LICENSE file for details.
+SmsSender is released under the MIT License. See the bundled LICENSE file for details.
