@@ -143,15 +143,15 @@ a recipient phonenumber, and you're done.
 ``` php
 <?php
 
-$sender = new \chSmsSender\chSmsSender();
+$sender = new \SmsSender\SmsSender();
 $sender->registerProviders(array(
-    new \chSmsSender\Provider\EsendexProvider(
+    new \SmsSender\Provider\EsendexProvider(
         $adapter, '<ESENDEX_USER>', '<ESENDEX_PASS>', '<ESENDEX_ACCOUNT>'
     ),
-    new \chSmsSender\Provider\OtherProvider($adapter)
+    new \SmsSender\Provider\OtherProvider($adapter)
 ));
 
-$singleRecipientSender = new \chSmsSender\SingleRecipientSender($sender, '0601010101');
+$singleRecipientSender = new \SmsSender\SingleRecipientSender($sender, '0601010101');
 ```
 
 All SMS now will be sent to `0601010101`, but in a transparent way:
