@@ -37,7 +37,7 @@ class EsendexProviderTest extends TestCase
         $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty('', $result['originator']);
+        $this->assertEmpty($result['originator']);
     }
 
     public function testSendWithMockData()
@@ -53,7 +53,7 @@ EOF;
         $this->assertEquals(ResultInterface::STATUS_SENT, $result['status']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty('', $result['originator']);
+        $this->assertEmpty($result['originator']);
     }
 
     public function testSendWithMockDataAndOriginator()
@@ -81,7 +81,7 @@ EOF;
         $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
         $this->assertNull($result['recipient']);
         $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty('', $result['originator']);
+        $this->assertEmpty($result['originator']);
     }
 
     public function testSendWithNullMessage()
@@ -93,7 +93,7 @@ EOF;
         $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
         $this->assertEquals('0642424242', $result['recipient']);
         $this->assertNull($result['body']);
-        $this->assertEmpty('', $result['originator']);
+        $this->assertEmpty($result['originator']);
     }
 
     public function testSendWithEmptyPhone()
@@ -103,9 +103,9 @@ EOF;
 
         $this->assertNull($result['id']);
         $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEquals('', $result['recipient']);
+        $this->assertEmpty($result['recipient']);
         $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty('', $result['originator']);
+        $this->assertEmpty($result['originator']);
     }
 
     public function testSendWithEmptyMessage()
@@ -116,8 +116,8 @@ EOF;
         $this->assertNull($result['id']);
         $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
         $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertEquals('', $result['body']);
-        $this->assertEmpty('', $result['originator']);
+        $this->assertEmpty($result['body']);
+        $this->assertEmpty($result['originator']);
     }
 /*
     public function testSendForReal()
