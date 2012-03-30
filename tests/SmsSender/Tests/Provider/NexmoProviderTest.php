@@ -109,6 +109,15 @@ EOF;
         $this->assertEquals('+33642424242', $adapter->data['to']);
     }
 
+    public function testSendWithLocalPhoneNumberAndCustomFormat()
+    {
+        $adapter = new MockAdapter;
+        $this->provider = new NexmoProvider($adapter, 'key', 'secret', '+44');
+        $result = $this->provider->send('0642424242', 'foo', 'originator');
+
+        $this->assertEquals('+44642424242', $adapter->data['to']);
+    }
+
     public function testSendWithUnicodeMessage()
     {
         $adapter = new MockAdapter;

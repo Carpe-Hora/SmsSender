@@ -25,9 +25,10 @@ Currently, there are the following adapters:
 
 _Providers_ contain the logic to extract useful information.
 
-Currently, there is only one provider:
+Currently, there are only two providers:
 
 * [Esendex](http://www.esendex.fr/)
+* [Nexmo](http://www.nexmo.com/)
 
 Installation
 ------------
