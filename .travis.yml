@@ -1,8 +1,16 @@
 language: php
-php: 5.3
+
+php:
+    - 5.3
+    - 5.4
+    - 5.5
+
 before_script:
-  - ./bin/install_vendors.sh
-script: phpunit
+    - curl -s http://getcomposer.org/installer | php
+    - php composer.phar install --dev
+
+script: phpunit --coverage-text
+
 notifications:
-  email:
-    - kevin_gomez@carpe-hora.com
+    email:
+        - kevin_gomez@carpe-hora.com
