@@ -3,7 +3,7 @@
 namespace SmsSender\Tests;
 
 use SmsSender\SmsSender;
-use SmsSender\Provider\ProviderInterface;
+
 
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
@@ -19,24 +19,24 @@ class SmsSenderTest extends TestCase
 
     public function testRegisterProvider()
     {
-        $provider = new MockProvider('test');
-        $this->sender->registerProvider($provider);
+        $provider = $this->getTestProvider('test_provider');
 
+        $this->sender->registerProvider($provider);
         $this->assertSame($provider, $this->sender->getProvider());
     }
 
     public function testRegisterProviders()
     {
-        $provider = new MockProvider('test');
-        $this->sender->registerProviders(array($provider));
+        $provider = $this->getTestProvider('test_provider');
 
+        $this->sender->registerProviders(array($provider));
         $this->assertSame($provider, $this->sender->getProvider());
     }
 
     public function testUsing()
     {
-        $provider1 = new MockProvider('test1');
-        $provider2 = new MockProvider('test2');
+        $provider1 = $this->getTestProvider('test1');
+        $provider2 = $this->getTestProvider('test2');
         $this->sender->registerProviders(array($provider1, $provider2));
 
         $this->assertSame($provider1, $this->sender->getProvider());
@@ -62,8 +62,8 @@ class SmsSenderTest extends TestCase
 
     public function testGetProviders()
     {
-        $provider1 = new MockProvider('test1');
-        $provider2 = new MockProvider('test2');
+        $provider1 = $this->getTestProvider('test1');
+        $provider2 = $this->getTestProvider('test2');
 
         $this->sender->registerProviders(array($provider1, $provider2));
         $result = $this->sender->getProviders();
@@ -89,77 +89,71 @@ class SmsSenderTest extends TestCase
 
     public function testGetProviderWithMultipleProvidersReturnsTheFirstOne()
     {
-        $provider1 = new MockProvider('test1');
-        $provider2 = new MockProvider('test2');
-        $provider3 = new MockProvider('test3');
-        $this->sender->registerProviders(array($provider1, $provider2, $provider3));
+        $provider1 = $this->getTestProvider('test1');
+        $provider2 = $this->getTestProvider('test2');
+        $this->sender->registerProviders(array($provider1, $provider2));
 
         $this->assertSame($provider1, $this->sender->getProvider());
     }
 
     public function testSendReturnsInstanceOfSms()
     {
-        $this->sender->registerProvider(new MockProvider('test1'));
-        $this->assertInstanceOf('\SmsSender\Result\Sms', $this->sender->send('phone', 'message'));
+        $number = 'phone number';
+        $message = 'message content';
+
+        $provider = $this->getTestProvider('dummy');
+        $provider
+            ->expects($this->once())
+            ->method('send')
+            ->with($number, $message)
+            ->will($this->returnValue(array()));
+
+        $this->sender->registerProvider($provider);
+        $this->assertInstanceOf('\SmsSender\Result\Sms', $this->sender->send($number, $message));
     }
 
     public function testEmpty()
     {
-        $this->sender->registerProvider(new MockProviderWithRequestCount('test2'));
-        $this->assertEmptyResult($this->sender->send('', 'foo'));
-        $this->assertEquals(0, $this->sender->getProvider('test2')->sendCount);
-        $this->assertEmptyResult($this->sender->send('0565212547', ''));
-        $this->assertEquals(0, $this->sender->getProvider('test2')->sendCount);
-        $this->assertEmptyResult($this->sender->send('0565212547', 'foo'));
-        $this->assertEquals(1, $this->sender->getProvider('test2')->sendCount);
+        $number = 'phone number';
+        $message = 'message content';
+
+        $provider = $this->getTestProvider('dummy');
+        $provider
+            ->expects($this->once())
+            ->method('send')
+            ->with($number, $message)
+            ->will($this->returnValue(array()));
+
+        $this->sender->registerProvider($provider);
+        $this->assertEmptyResult($this->sender->send('', $message));
+        $this->assertEmptyResult($this->sender->send($number, ''));
+        $this->assertEmptyResult($this->sender->send($number, $message));
     }
 
     protected function assertEmptyResult($result)
     {
+        $this->assertInstanceOf('\SmsSender\Result\Sms', $result);
+
         $this->assertNull($result->getId());
         $this->assertFalse($result->isSent());
     }
-}
 
-class MockProvider implements ProviderInterface
-{
-    protected $name;
-
-    public function __construct($name)
+    protected function getTestProvider($name)
     {
-        $this->name = $name;
-    }
+        $provider = $this->getMock('\SmsSender\Provider\ProviderInterface');
+        $provider
+            ->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue($name));
 
-    public function send($recipient, $body, $originator = '')
-    {
-        return array();
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-}
-
-class MockProviderWithRequestCount extends MockProvider
-{
-    public $sendCount = 0;
-
-    public function send($number, $message, $originator = '')
-    {
-        $this->sendCount++;
-        return array();
+        return $provider;
     }
 }
 
 class TestableSmsSender extends SmsSender
 {
-    public $countCallGetProvider = 0;
-
     public function getProvider()
     {
-        $this->countCallGetProvider++;
-
         return parent::getProvider();
     }
 }

@@ -28,97 +28,50 @@ class EsendexProviderTest extends TestCase
         $provider->getStatus('dummyMessageId');
     }
 
-    public function testSend()
+    /**
+     * @dataProvider sendDataprovider
+     */
+    public function testSend($send_to, $send_msg, $send_from, $api_response, $expected_result)
     {
-        $this->provider = new EsendexProvider($this->getMockAdapter(), 'username', 'pass', 'account');
-        $result = $this->provider->send('0642424242', 'foo');
+        $this->provider = new EsendexProvider($this->getMockAdapter(null, $api_response), 'username', 'pass', 'account');
+        $result = $this->provider->send($send_to, $send_msg, $send_from);
 
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty($result['originator']);
+        $this->assertSame($expected_result['id'], $result['id']);
+        $this->assertSame($expected_result['status'], $result['status']);
+        $this->assertSame($expected_result['recipient'], $result['recipient']);
+        $this->assertSame($expected_result['body'], $result['body']);
+        $this->assertSame($expected_result['originator'], $result['originator']);
     }
 
-    public function testSendWithMockData()
+    public function sendDataprovider()
     {
-        $data = <<<EOF
+        $number = '0642424242';
+        $msg = 'foo';
+
+        $sms = array(
+            'id'            => null,
+            'status'        => ResultInterface::STATUS_FAILED,
+            'recipient'     => $number,
+            'body'          => $msg,
+            'originator'    => '',
+        );
+
+        $api_data = <<<EOF
 Result=OK
 MessageIDs=3c13bbba-a9c2-460c-961b-4d6772960af0
 EOF;
-        $this->provider = new EsendexProvider($this->getMockAdapter(null, $data), 'username', 'pass', 'account');
-        $result = $this->provider->send('0642424242', 'foo');
 
-        $this->assertEquals('3c13bbba-a9c2-460c-961b-4d6772960af0', $result['id']);
-        $this->assertEquals(ResultInterface::STATUS_SENT, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty($result['originator']);
+        return array(
+            array($number, $msg, '',          null,        $sms),
+            array(null,    $msg, '',          null,        array_merge($sms, array('recipient' => null))),
+            array('',      $msg, '',          null,        array_merge($sms, array('recipient' => ''))),
+            array($number, null, '',          null,        array_merge($sms, array('body' => null))),
+            array($number, '', '',            null,        array_merge($sms, array('body' => ''))),
+            array($number, $msg, '',          $api_data,   array_merge($sms, array('id' => '3c13bbba-a9c2-460c-961b-4d6772960af0', 'status' => ResultInterface::STATUS_SENT))),
+            array($number, $msg, 'Superman',  $api_data,   array_merge($sms, array('id' => '3c13bbba-a9c2-460c-961b-4d6772960af0', 'status' => ResultInterface::STATUS_SENT, 'originator' => 'Superman'))),
+        );
     }
 
-    public function testSendWithMockDataAndOriginator()
-    {
-        $data = <<<EOF
-Result=OK
-MessageIDs=3c13bbba-a9c2-460c-961b-4d6772960af0
-EOF;
-        $this->provider = new EsendexProvider($this->getMockAdapter(null, $data), 'username', 'pass', 'account');
-        $result = $this->provider->send('0642424242', 'foo', 'Superman');
-
-        $this->assertEquals('3c13bbba-a9c2-460c-961b-4d6772960af0', $result['id']);
-        $this->assertEquals(ResultInterface::STATUS_SENT, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertEquals('foo', $result['body']);
-        $this->assertEquals('Superman', $result['originator']);
-    }
-
-    public function testSendWithNullPhone()
-    {
-        $this->provider = new EsendexProvider($this->getMockAdapter(), 'username', 'pass', 'account');
-        $result = $this->provider->send(null, 'foo');
-
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertNull($result['recipient']);
-        $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty($result['originator']);
-    }
-
-    public function testSendWithNullMessage()
-    {
-        $this->provider = new EsendexProvider($this->getMockAdapter(), 'username', 'pass', 'account');
-        $result = $this->provider->send('0642424242', null);
-
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertNull($result['body']);
-        $this->assertEmpty($result['originator']);
-    }
-
-    public function testSendWithEmptyPhone()
-    {
-        $this->provider = new EsendexProvider($this->getMockAdapter(), 'username', 'pass', 'account');
-        $result = $this->provider->send('', 'foo');
-
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEmpty($result['recipient']);
-        $this->assertEquals('foo', $result['body']);
-        $this->assertEmpty($result['originator']);
-    }
-
-    public function testSendWithEmptyMessage()
-    {
-        $this->provider = new EsendexProvider($this->getMockAdapter(), 'username', 'pass', 'account');
-        $result = $this->provider->send('0642424242', '');
-
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertEmpty($result['body']);
-        $this->assertEmpty($result['originator']);
-    }
 /*
     public function testSendForReal()
     {

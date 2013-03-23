@@ -50,8 +50,7 @@ class SingleRecipientSenderTest extends TestCase
                 $this->isType(\PHPUnit_Framework_Constraint_IsType::TYPE_STRING),
                 $this->isEmpty()
             )
-            ->will($this->returnValue($result))
-            ;
+            ->will($this->returnValue($result));
 
         return $mock;
     }

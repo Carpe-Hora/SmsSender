@@ -174,7 +174,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
             $data['status'] = $data['Result'] == 'OK'
                 ? ResultInterface::STATUS_SENT
                 : ResultInterface::STATUS_FAILED;
-            unset($data['Success']);
+            unset($data['Result']);
         }
 
         if (isset($data['MessageIDs'])) {
