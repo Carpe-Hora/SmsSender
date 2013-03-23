@@ -6,8 +6,7 @@ It provides an abstraction layer for sms manipulations.
 The library is splitted in two parts: `HttpAdapter` and `Provider` and is
 really extensible.
 
-[![Build
-Status](https://secure.travis-ci.org/Carpe-Hora/SmsSender.png)](http://travis-ci.org/Carpe-Hora/SmsSender)
+[![Build Status](https://secure.travis-ci.org/Carpe-Hora/SmsSender.png)](http://travis-ci.org/Carpe-Hora/SmsSender)
 
 
 ### HttpAdapters ###
@@ -33,16 +32,38 @@ Currently, there are only two providers:
 Installation
 ------------
 
-If you don't use a _ClassLoader_ in your application, just require the provided
-autoloader:
+The recommended way to install SmsSender is through composer.
 
-``` php
-<?php
+Just create a `composer.json` file for your project:
 
-require_once 'src/autoload.php';
+```json
+{
+    "require": {
+        "Carpe-Hora/SmsSender": "dev-master"
+    }
+}
 ```
 
-You're done.
+And run these two commands to install it:
+
+```bash
+$ wget http://getcomposer.org/composer.phar
+$ php composer.phar install
+```
+
+
+Now you can add the autoloader, and you will have access to the library:
+
+```php
+require 'vendor/autoload.php';
+```
+
+If you don't use neither **Composer** nor a _ClassLoader_ in your application,
+just clone the repository and require the provided autoloader:
+
+```php
+require_once 'src/autoload.php';
+```
 
 
 Usage
@@ -184,17 +205,17 @@ Note, the `AbstractProvider` class can help you by providing useful features.
 Unit Tests
 ----------
 
-To run unit tests, you'll need a set of dependencies you can install by
-running the `install_vendors.sh` script:
+To run unit tests, you'll need a set of dependencies you can install using
+composer:
 
 ``` bash
-./bin/install_vendors.sh
+php composer.phar install --dev
 ```
 
 Once installed, just launch the following command:
 
 ``` bash
-phpunit
+./vendor/bin/phpunit
 ```
 
 You'll obtain some _skipped_ unit tests due to the need of API keys.
