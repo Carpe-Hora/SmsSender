@@ -16,13 +16,13 @@
         <!-- <server name="ESENDEX_API_ACCOUNT" value="Your esendex account reference" /> -->
     </php>
     <testsuites>
-        <testsuite name="chSmsSender Test Suite">
+        <testsuite name="SmsSender Test Suite">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory>./src/chSmsSender/</directory>
+            <directory>./src/SmsSender/</directory>
         </whitelist>
     </filter>
 </phpunit>
