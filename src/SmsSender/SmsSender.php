@@ -11,6 +11,7 @@
 namespace SmsSender;
 
 use SmsSender\Provider\ProviderInterface;
+use SmsSender\Result\ResultInterface;
 use SmsSender\Result\Sms;
 
 /**
@@ -48,7 +49,9 @@ class SmsSender implements SmsSenderInterface
     {
         if (empty($recipient) || empty($body)) {
             // let's save a request
-            return $this->returnResult(array());
+            return $this->returnResult(array(
+                'status' => ResultInterface::STATUS_FAILED,
+            ));
         }
 
         $data   = $this->getProvider()->send($recipient, $body, $originator);
