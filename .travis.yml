@@ -10,7 +10,3 @@ before_script:
     - php composer.phar install --dev
 
 script: phpunit --coverage-text
-
-notifications:
-    email:
-        - kevin_gomez@carpe-hora.com
