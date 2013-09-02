@@ -226,9 +226,8 @@ following lines and add your own API keys:
 
 ``` xml
 <php>
-    <!-- <server name="ESENDEX_API_USER" value="Your esendex user" /> -->
-    <!-- <server name="ESENDEX_API_PASS" value="Your esendex password" /> -->
-    <!-- <server name="ESENDEX_API_ACCOUNT" value="Your esendex account reference" /> -->
+      <!-- <server name="TWILIO_ACCOUNT_SID" value="Your Twilio account sid" /> -->
+      <!-- <server name="TWILIO_API_SECRET" value="Your Twilio API secret" /> -->
 </php>
 ```
 
