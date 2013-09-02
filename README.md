@@ -28,6 +28,7 @@ Currently, there are only two providers:
 
 * [Esendex](http://www.esendex.fr/)
 * [Nexmo](http://www.nexmo.com/)
+* [Twilio](https://www.twilio.com/)
 
 Installation
 ------------

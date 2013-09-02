@@ -17,22 +17,22 @@ use SmsSender\Result\ResultInterface;
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-class NexmoProvider extends AbstractProvider implements ProviderInterface
+class TwilioProvider extends AbstractProvider implements ProviderInterface
 {
     /**
      * @var string
      */
-    const SEND_SMS_URL = 'https://rest.nexmo.com/sms/json';
+    const SEND_SMS_URL = 'https://api.twilio.com/2010-04-01/Accounts/%s/SMS/Messages.json';
 
     /**
      * @var string
      */
-    protected $api_key;
+    protected $accountSid;
 
     /**
      * @var string
      */
-    protected $api_secret;
+    protected $authToken;
 
     /**
      * @var string
@@ -42,12 +42,12 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function __construct(HttpAdapterInterface $adapter, $api_key, $api_secret, $international_prefix = '+33')
+    public function __construct(HttpAdapterInterface $adapter, $accountSid, $authToken, $international_prefix = '+33')
     {
         parent::__construct($adapter);
 
-        $this->api_key = $api_key;
-        $this->api_secret = $api_secret;
+        $this->accountSid = $accountSid;
+        $this->authToken = $authToken;
         $this->international_prefix = $international_prefix;
     }
 
@@ -56,7 +56,7 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
      */
     public function send($recipient, $body, $originator = '')
     {
-        if (null === $this->api_key || null === $this->api_secret) {
+        if (null === $this->accountSid || null === $this->authToken) {
             throw new \RuntimeException('No API credentials provided');
         }
 
@@ -72,14 +72,13 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
         // rejected because of this
         $originator = $this->cleanOriginator($originator);
 
-        $params = $this->getParameters(array(
-            'to'    => $this->localNumberToInternational($recipient, $this->international_prefix),
-            'text'  => $body,
-            'from'  => $originator,
-            'type'  => $this->containsUnicode($body) ? 'unicode' : 'text',
-        ));
+        $params = array(
+            'To'    => $this->localNumberToInternational($recipient, $this->international_prefix),
+            'Body'  => $body,
+            'From'  => $originator,
+        );
 
-        return $this->executeQuery(self::SEND_SMS_URL, $params, array(
+        return $this->executeQuery(sprintf(self::SEND_SMS_URL, $this->accountSid), $params, array(
             'recipient'  => $recipient,
             'body'       => $body,
             'originator' => $originator,
@@ -91,7 +90,7 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
      */
     public function getName()
     {
-        return 'nexmo';
+        return 'twilio';
     }
 
     /**
@@ -100,27 +99,16 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
      */
     protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
     {
-        $content = $this->getAdapter()->getContent($url, 'POST', $headers = array(), $data);
+        $headers = array(
+            sprintf('Authorization: Basic %s', base64_encode(sprintf('%s:%s', $this->accountSid, $this->authToken))),
+        );
+        $content = $this->getAdapter()->getContent($url, 'POST', $headers, $data);
 
         if (null === $content) {
             return array_merge($this->getDefaults(), $extra_result_data);
         }
 
         return $this->parseResults($content, $extra_result_data);
-    }
-
-    /**
-     * Builds the parameters list to send to the API.
-     *
-     * @return array
-     * @author Kevin Gomez <kevin_gomez@carpe-hora.com>
-     */
-    public function getParameters(array $additionnal_parameters = array())
-    {
-        return array_merge(array(
-            'username'  => $this->api_key,
-            'password'  => $this->api_secret,
-        ), $additionnal_parameters);
     }
 
     /**
@@ -134,20 +122,28 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
         $data = json_decode($result, true);
         $sms_data = array();
 
-        if (empty($data['message-count']) || $data['message-count'] < 1) {
-            return array_merge($this->getDefaults(), $extra_result_data);
+        // there was an error
+        if (empty($data['sid']) || !empty($data['message'])) {
+            return array_merge($this->getDefaults(), $extra_result_data, array(
+                'status' => ResultInterface::STATUS_FAILED,
+            ));
         }
 
-        // for now, only consider the first message
-        $message = $data['messages'][0];
-
         // get the id
-        $sms_data['id'] = $message['message-id'];
+        $sms_data['id'] = $data['sid'];
 
         // get the status
-        $sms_data['status'] = $message['status'] === '0'
-            ? ResultInterface::STATUS_SENT
-            : ResultInterface::STATUS_FAILED;
+        switch ($data['status']) {
+            case 'failed':
+                $sms_data['status'] = ResultInterface::STATUS_FAILED;
+                break;
+            case 'received':
+                $sms_data['status'] = ResultInterface::STATUS_DELIVERED;
+                break;
+            default:
+                $sms_data['status'] = ResultInterface::STATUS_SENT;
+                break;
+        }
 
         return array_merge($this->getDefaults(), $extra_result_data, $sms_data);
     }

@@ -115,7 +115,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
         $content = $this->getAdapter()->getContent($url, 'POST', $headers = array(), $data);
 
         if (null === $content) {
-            return $this->getDefaults();
+            return array_merge($this->getDefaults(), $extra_result_data);
         }
 
         return $this->parseResults($content, $extra_result_data);

@@ -20,7 +20,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $mock
             ->expects($expects)
             ->method('getContent')
-            ->will(null !== $content ? $this->returnValue($content) : $this->returnArgument(0));
+            ->will($this->returnValue($content));
 
         return $mock;
     }
