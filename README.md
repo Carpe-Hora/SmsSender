@@ -160,7 +160,7 @@ to avoid sending SMS to real users, but still allow the developer to check the r
 in an SMS reader.
 
 By using the `SingleRecipientSender`, you'll be able to send your SMS without any other changes
-thanks to the decorator pattern. Just pass your in-use sender (`chSmsSender` for instance) and
+thanks to the decorator pattern. Just pass your in-use sender (`SmsSender` for instance) and
 a recipient phonenumber, and you're done.
 
 ``` php
