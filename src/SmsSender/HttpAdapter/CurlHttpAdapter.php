@@ -18,7 +18,7 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
     /**
      * {@inheritDoc}
      */
-    function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
+    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
     {
         if (!function_exists('curl_init')) {
             throw new \RuntimeException('cURL has to be enabled.');

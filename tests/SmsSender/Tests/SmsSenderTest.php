@@ -4,7 +4,6 @@ namespace SmsSender\Tests;
 
 use SmsSender\SmsSender;
 
-
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */

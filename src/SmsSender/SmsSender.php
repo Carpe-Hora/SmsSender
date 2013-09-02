@@ -33,7 +33,6 @@ class SmsSender implements SmsSenderInterface
      */
     protected $provider = null;
 
-
     /**
      * @param \SmsSender\Provider\ProviderInterface $provider
      */
@@ -61,7 +60,7 @@ class SmsSender implements SmsSenderInterface
     /**
      * Registers a provider.
      *
-     * @param \SmsSender\Provider\ProviderInterface $provider
+     * @param  \SmsSender\Provider\ProviderInterface $provider
      * @return \SmsSender\AbstractProvider
      */
     public function registerProvider(ProviderInterface $provider)
@@ -76,7 +75,7 @@ class SmsSender implements SmsSenderInterface
     /**
      * Registers a set of providers.
      *
-     * @param array $providers
+     * @param  array                       $providers
      * @return \SmsSender\AbstractProvider
      */
     public function registerProviders(array $providers = array())
@@ -91,7 +90,7 @@ class SmsSender implements SmsSenderInterface
     /**
      * Sets the provider to use.
      *
-     * @param string $name  A provider's name
+     * @param  string                      $name A provider's name
      * @return \SmsSender\AbstractProvider
      */
     public function using($name)
@@ -132,7 +131,7 @@ class SmsSender implements SmsSenderInterface
     }
 
     /**
-     * @param array $data   An array of data.
+     * @param  array                 $data An array of data.
      * @return \SmsSender\Result\Sms
      */
     protected function returnResult(array $data = array())

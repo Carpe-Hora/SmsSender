@@ -40,7 +40,6 @@ class Sms implements ResultInterface, \ArrayAccess
      */
     protected $status = null;
 
-
     /**
      * {@inheritDoc}
      */

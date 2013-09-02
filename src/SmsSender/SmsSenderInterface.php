@@ -22,9 +22,9 @@ interface SmsSenderInterface
      * @param string $body       The message to send.
      * @param string $originator The name of the person which sends the message.
      *
-     * @return \SmsSender\Result\Sms    A Sms result object.
+     * @return \SmsSender\Result\Sms A Sms result object.
      */
-    function send($recipient, $body, $originator = '');
+    public function send($recipient, $body, $originator = '');
 }
 
 // vim: set softtabstop=4 tabstop=4 shiftwidth=4 autoindent:

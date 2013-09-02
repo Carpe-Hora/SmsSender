@@ -10,7 +10,6 @@
 
 namespace SmsSender;
 
-use SmsSender\Provider\ProviderInterface;
 use SmsSender\Result\Sms;
 
 /**

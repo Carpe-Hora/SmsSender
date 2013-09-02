@@ -144,6 +144,7 @@ class MockAdapter implements HttpAdapterInterface
     public function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
     {
       $this->data = $data;
+
       return json_encode($data);
     }
 

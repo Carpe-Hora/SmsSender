@@ -26,17 +26,17 @@ interface HttpAdapterInterface
      *                            'Content-type: text/plain',
      *                            'Content-length: 100'
      *                          )
-     * @param array  $data    The data to send when doing non "get" requests.
+     * @param  array  $data The data to send when doing non "get" requests.
      * @return string
      */
-    function getContent($url, $method = 'GET', array $headers = array(), array $data = array());
+    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array());
 
     /**
      * Returns the name of the HTTP Adapter.
      *
      * @return string
      */
-    function getName();
+    public function getName();
 }
 
 // vim: set softtabstop=4 tabstop=4 shiftwidth=4 autoindent:

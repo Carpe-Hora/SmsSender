@@ -44,7 +44,6 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
      */
     protected $accountRef;
 
-
     /**
      * {@inheritDoc}
      */
@@ -83,7 +82,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
     /**
      * Retrieves the status of a message
      *
-     * @param string $messageId The message Id.
+     * @param  string $messageId The message Id.
      * @return array
      */
     public function getStatus($messageId)
@@ -108,7 +107,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @param string $query
+     * @param  string $query
      * @return array
      */
     protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
@@ -141,7 +140,7 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
     /**
      * Parse the data returned by the API.
      *
-     * @param string $result The raw result string.
+     * @param  string $result The raw result string.
      * @return array
      */
     protected function parseResults($result, array $extra_result_data = array())
@@ -167,7 +166,6 @@ class EsendexProvider extends AbstractProvider implements ProviderInterface
               $data[$line_data[0]] = trim(urldecode($line_data[1]));
             }
         }
-
 
         // and now, clean a bit the data
         if (isset($data['Result'])) {

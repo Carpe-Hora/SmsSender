@@ -23,9 +23,8 @@ abstract class AbstractProvider
      */
     protected $adapter = null;
 
-
     /**
-     * @param \SmsSender\HttpAdapter\HttpAdapterInterface $adapter   An HTTP adapter.
+     * @param \SmsSender\HttpAdapter\HttpAdapterInterface $adapter An HTTP adapter.
      */
     public function __construct(HttpAdapterInterface $adapter)
     {

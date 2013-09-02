@@ -22,16 +22,16 @@ interface ProviderInterface
      * @param string $body       The message to send.
      * @param string $originator The name of the person which sends the message.
      *
-     * @return array             The data returned by the API.
+     * @return array The data returned by the API.
      */
-    function send($recipient, $body, $originator = '');
+    public function send($recipient, $body, $originator = '');
 
     /**
      * Returns the provider's name.
      *
      * @return string
      */
-    function getName();
+    public function getName();
 }
 
 // vim: set softtabstop=4 tabstop=4 shiftwidth=4 autoindent:

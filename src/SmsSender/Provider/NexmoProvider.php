@@ -39,7 +39,6 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
      */
     protected $international_prefix;
 
-
     /**
      * {@inheritDoc}
      */
@@ -96,7 +95,7 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
     }
 
     /**
-     * @param string $query
+     * @param  string $query
      * @return array
      */
     protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
@@ -127,7 +126,7 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
     /**
      * Parse the data returned by the API.
      *
-     * @param string $result The raw result string.
+     * @param  string $result The raw result string.
      * @return array
      */
     protected function parseResults($result, array $extra_result_data = array())
@@ -174,7 +173,7 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
             $ret = substr($ret, 0, 11);
         } else {
             // Numerical, remove any prepending '00'
-            if(substr($ret, 0, 2) == '00') {
+            if (substr($ret, 0, 2) == '00') {
                 $ret = substr($ret, 2);
                 $ret = substr($ret, 0, 15);
             }
