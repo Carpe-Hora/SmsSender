@@ -2,15 +2,19 @@
 
 namespace SmsSender\Tests\Provider;
 
-use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Provider\NexmoProvider;
 use SmsSender\Result\ResultInterface;
-use SmsSender\Tests\TestCase;
 
-class NexmoProviderTest extends TestCase
+class NexmoProviderTest extends BaseProviderTest
 {
+    protected function getProvider($adapter)
+    {
+        return new NexmoProvider($adapter, 'key', 'secret');
+    }
+
     /**
-     * @expectedException \RuntimeException
+     * @expectedException           \RuntimeException
+     * @expectedExceptionMessage    No API credentials provided
      */
     public function testSendWithNullApiCredentials()
     {
@@ -20,7 +24,8 @@ class NexmoProviderTest extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException           \RuntimeException
+     * @expectedExceptionMessage    The originator parameter is required for this provider.
      */
     public function testSendWithNoOriginator()
     {
@@ -57,99 +62,77 @@ EOF;
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @dataProvider validRecipientProvider
      */
-    public function testSendWithNullPhone()
+    public function testSendCleansRecipientNumber($recipient, $expectedRecipient, $internationalPrefix = null)
     {
+        // setup the adapter
         $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $this->provider = new NexmoProvider($adapter, 'key', 'secret');
-        $result = $this->provider->send(null, 'foo', 'originator');
+        $adapter
+            ->expects($this->once())
+            ->method('getContent')
+            ->with(
+                $this->anything(),      // URL
+                $this->equalTo('POST'), // method
+                $this->anything(),      // headers
+                $this->callback(function($data) use ($expectedRecipient) {
+                    return !empty($data['to']) && $data['to'] === $expectedRecipient;
+                })
+            );
+
+        // setup the provider
+        if ($internationalPrefix === null) {
+            $provider = new NexmoProvider($adapter, 'key', 'secret');
+        } else {
+            $provider = new NexmoProvider($adapter, 'key', 'secret', $internationalPrefix);
+        }
+
+        // launch the test
+        $provider->send($recipient, 'foo', 'originator');
     }
 
-    public function testSendWithNullMessage()
+    public function validRecipientProvider()
     {
-        $this->provider = new NexmoProvider($this->getMockAdapter(), 'key', 'secret');
-        $result = $this->provider->send('0642424242', null, 'originator');
-
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertNull($result['body']);
-        $this->assertEquals('originator', $result['originator']);
+        return array(
+            array('0642424242', '+33642424242', null),
+            array('0642424242', '+33642424242', '+33'),
+            array('0642424242', '+44642424242', '+44'),
+            array('+33642424242', '+33642424242', '+33'),
+            array('+33642424242', '+33642424242', '+44'),
+        );
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @dataProvider validBodyProvider
      */
-    public function testSendWithEmptyPhone()
+    public function testSendDetectsBodyType($body, $expectedType)
     {
+        // setup the adapter
         $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $this->provider = new NexmoProvider($adapter, 'key', 'secret');
-        $result = $this->provider->send('', 'foo', 'originator');
+        $adapter
+            ->expects($this->once())
+            ->method('getContent')
+            ->with(
+                $this->anything(),      // URL
+                $this->equalTo('POST'), // method
+                $this->anything(),      // headers
+                $this->callback(function($data) use ($expectedType) {
+                    return !empty($data['type']) && $data['type'] === $expectedType;
+                })
+            );
+
+        // setup the provider
+        $provider = new NexmoProvider($adapter, 'key', 'secret');
+
+        // launch the test
+        $provider->send('0642424242', $body, 'originator');
     }
 
-    public function testSendWithEmptyMessage()
+    public function validBodyProvider()
     {
-        $this->provider = new NexmoProvider($this->getMockAdapter(), 'key', 'secret');
-        $result = $this->provider->send('0642424242', '', 'originator' );
-
-        $this->assertNull($result['id']);
-        $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
-        $this->assertEquals('0642424242', $result['recipient']);
-        $this->assertEquals('', $result['body']);
-        $this->assertEquals('originator', $result['originator']);
-    }
-
-    public function testSendWithLocalPhoneNumber()
-    {
-        $adapter = new MockAdapter;
-        $this->provider = new NexmoProvider($adapter, 'key', 'secret');
-        $result = $this->provider->send('0642424242', 'foo', 'originator');
-
-        $this->assertEquals('+33642424242', $adapter->data['to']);
-    }
-
-    public function testSendWithLocalPhoneNumberAndCustomFormat()
-    {
-        $adapter = new MockAdapter;
-        $this->provider = new NexmoProvider($adapter, 'key', 'secret', '+44');
-        $result = $this->provider->send('0642424242', 'foo', 'originator');
-
-        $this->assertEquals('+44642424242', $adapter->data['to']);
-    }
-
-    public function testSendWithUnicodeMessage()
-    {
-        $adapter = new MockAdapter;
-        $this->provider = new NexmoProvider($adapter, 'key', 'secret');
-        $result = $this->provider->send('0642424242', 'foo €', 'originator');
-
-        $this->assertEquals('unicode', $adapter->data['type']);
-    }
-
-    public function testSendWithTextMessage()
-    {
-        $adapter = new MockAdapter;
-        $this->provider = new NexmoProvider($adapter, 'key', 'secret');
-        $result = $this->provider->send('0642424242', 'foo', 'originator');
-
-        $this->assertEquals('text', $adapter->data['type']);
-    }
-}
-
-class MockAdapter implements HttpAdapterInterface
-{
-    public $data;
-
-    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
-    {
-      $this->data = $data;
-
-      return json_encode($data);
-    }
-
-    public function getName()
-    {
-      return 'MockAdapter';
+        return array(
+            array('foo', 'text'),
+            array('foo €', 'unicode'),
+        );
     }
 }

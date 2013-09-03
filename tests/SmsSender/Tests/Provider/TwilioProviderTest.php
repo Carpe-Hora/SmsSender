@@ -5,10 +5,14 @@ namespace SmsSender\Tests\Provider;
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Provider\TwilioProvider;
 use SmsSender\Result\ResultInterface;
-use SmsSender\Tests\TestCase;
 
-class TwilioProviderTest extends TestCase
+class TwilioProviderTest extends BaseProviderTest
 {
+    protected function getProvider($adapter)
+    {
+        return new TwilioProvider($adapter, 'key', 'secret');
+    }
+
     /**
      * @expectedException           \RuntimeException
      * @expectedExceptionMessage    No API credentials provided
@@ -22,23 +26,11 @@ class TwilioProviderTest extends TestCase
 
     /**
      * @expectedException           \RuntimeException
-     * @expectedExceptionMessage    The recipient parameter is required.
-     */
-    public function testSendWithNoRecipient()
-    {
-        $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $provider = new TwilioProvider($adapter, 'key', 'secret');
-        $provider->send('', 'foo!', 'originator');
-    }
-
-    /**
-     * @expectedException           \RuntimeException
      * @expectedExceptionMessage    The originator parameter is required for this provider.
      */
     public function testSendWithNoOriginator()
     {
-        $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $provider = new TwilioProvider($adapter, 'key', 'secret');
+        $provider = new TwilioProvider($this->getMockAdapter($this->never()), 'key', 'secret');
         $provider->send('0642424242', 'foo!');
     }
 
@@ -69,42 +61,45 @@ EOF;
         $this->assertEquals('+15005550006', $result['originator']);
     }
 
-    public function testSendWithLocalPhoneNumber()
+    /**
+     * @dataProvider validRecipientProvider
+     */
+    public function testSendCleansRecipientNumber($recipient, $expectedRecipient, $internationalPrefix = null)
     {
-        $mock = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $mock
+        // setup the adapter
+        $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
+        $adapter
             ->expects($this->once())
             ->method('getContent')
             ->with(
                 $this->anything(),      // URL
                 $this->equalTo('POST'), // method
                 $this->anything(),      // headers
-                $this->callback(function($data) {
-                    return !empty($data['To']) && $data['To'] === '+33642424242';
+                $this->callback(function($data) use ($expectedRecipient) {
+                    return !empty($data['To']) && $data['To'] === $expectedRecipient;
                 })
             );
 
-        $provider = new TwilioProvider($mock, 'key', 'secret');
-        $provider->send('0642424242', 'foo', 'originator');
+        // setup the provider
+        if ($internationalPrefix === null) {
+            $provider = new TwilioProvider($adapter, 'key', 'secret');
+        } else {
+            $provider = new TwilioProvider($adapter, 'key', 'secret', $internationalPrefix);
+        }
+
+        // launch the test
+        $provider->send($recipient, 'foo', 'originator');
     }
 
-    public function testSendWithLocalPhoneNumberAndCustomFormat()
+    public function validRecipientProvider()
     {
-        $mock = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $mock
-            ->expects($this->once())
-            ->method('getContent')
-            ->with(
-                $this->anything(),      // URL
-                $this->equalTo('POST'), // method
-                $this->anything(),      // headers
-                $this->callback(function($data) {
-                    return !empty($data['To']) && $data['To'] === '+44642424242';
-                })
-            );
-
-        $provider = new TwilioProvider($mock, 'key', 'secret', '+44');
-        $provider->send('0642424242', 'foo', 'originator');
+        return array(
+            array('0642424242', '+33642424242', null),
+            array('0642424242', '+33642424242', '+33'),
+            array('0642424242', '+44642424242', '+44'),
+            array('+33642424242', '+33642424242', '+33'),
+            array('+33642424242', '+33642424242', '+44'),
+        );
     }
 
     /**

@@ -17,7 +17,7 @@ use SmsSender\Result\ResultInterface;
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-class TwilioProvider extends AbstractProvider implements ProviderInterface
+class TwilioProvider extends AbstractProvider
 {
     /**
      * @var string
@@ -58,10 +58,6 @@ class TwilioProvider extends AbstractProvider implements ProviderInterface
     {
         if (null === $this->accountSid || null === $this->authToken) {
             throw new \RuntimeException('No API credentials provided');
-        }
-
-        if (empty($recipient)) {
-            throw new \RuntimeException('The recipient parameter is required.');
         }
 
         if (empty($originator)) {

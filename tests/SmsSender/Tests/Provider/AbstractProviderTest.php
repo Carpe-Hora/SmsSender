@@ -15,7 +15,7 @@ class AbstractProviderTest extends TestCase
 {
     public function testGetAdapter()
     {
-        $adapter  = new MockHttpAdapter();
+        $adapter = $this->getMockAdapter($this->never());
         $provider = new MockProvider($adapter);
 
         $this->assertSame($adapter, $provider->getAdapter());
@@ -23,8 +23,7 @@ class AbstractProviderTest extends TestCase
 
     public function testGetDefaults()
     {
-        $adapter  = new MockHttpAdapter();
-        $provider = new MockProvider($adapter);
+        $provider = new MockProvider($this->getMockAdapter($this->never()));
         $result   = $provider->getDefaults();
 
         $this->assertEquals(2, count($result));
@@ -44,16 +43,13 @@ class MockProvider extends AbstractProvider
     {
         return parent::getDefaults();
     }
-}
 
-class MockHttpAdapter implements HttpAdapterInterface
-{
-    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
+    public function send($recipient, $body, $originator = '')
     {
     }
 
     public function getName()
     {
-        return 'mock_http_adapter';
+        return 'AbstractProviderTest';
     }
 }

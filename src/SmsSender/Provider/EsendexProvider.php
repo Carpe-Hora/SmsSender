@@ -17,7 +17,7 @@ use SmsSender\Result\ResultInterface;
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-class EsendexProvider extends AbstractProvider implements ProviderInterface
+class EsendexProvider extends AbstractProvider
 {
     /**
      * @var string

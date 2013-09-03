@@ -16,7 +16,7 @@ use SmsSender\Result\ResultInterface;
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-abstract class AbstractProvider
+abstract class AbstractProvider implements ProviderInterface
 {
     /**
      * @var \SmsSender\HttpAdapter\HttpAdapterInterface

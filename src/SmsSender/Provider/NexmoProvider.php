@@ -17,7 +17,7 @@ use SmsSender\Result\ResultInterface;
 /**
  * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
  */
-class NexmoProvider extends AbstractProvider implements ProviderInterface
+class NexmoProvider extends AbstractProvider
 {
     /**
      * @var string
@@ -58,10 +58,6 @@ class NexmoProvider extends AbstractProvider implements ProviderInterface
     {
         if (null === $this->api_key || null === $this->api_secret) {
             throw new \RuntimeException('No API credentials provided');
-        }
-
-        if (empty($recipient)) {
-            throw new \RuntimeException('The recipient parameter is required.');
         }
 
         if (empty($originator)) {

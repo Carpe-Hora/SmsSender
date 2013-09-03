@@ -4,12 +4,17 @@ namespace SmsSender\Tests\Provider;
 
 use SmsSender\Provider\EsendexProvider;
 use SmsSender\Result\ResultInterface;
-use SmsSender\Tests\TestCase;
 
-class EsendexProviderTest extends TestCase
+class EsendexProviderTest extends BaseProviderTest
 {
+    protected function getProvider($adapter)
+    {
+        return new EsendexProvider($adapter, 'username', 'pass', 'account');
+    }
+
     /**
-     * @expectedException \RuntimeException
+     * @expectedException           \RuntimeException
+     * @expectedExceptionMessage    No API credentials provided
      */
     public function testSendWithNullApiCredentials()
     {
@@ -19,7 +24,8 @@ class EsendexProviderTest extends TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException           \RuntimeException
+     * @expectedExceptionMessage    No API credentials provided
      */
     public function testGetStatusWithNullApiCredentials()
     {
