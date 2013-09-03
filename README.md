@@ -6,6 +6,9 @@ It provides an abstraction layer for sms manipulations.
 The library is splitted in two parts: `HttpAdapter` and `Provider` and is
 really extensible.
 
+**N.B**: there is also a [bundle](https://github.com/K-Phoen/KPhoenSmsSenderBundle)
+integrating this library in Symfony2 applications.
+
 
 ### HttpAdapters ###
 
@@ -244,7 +247,7 @@ special mention in this README ;)
 Credits
 -------
 
-* Kévin Gomez <kevin_gomez@carpe-hora.com>
+* Kévin Gomez <contact@kevingomez.fr>
 * [All contributors](https://github.com/Carpe-Hora/SmsSender/contributors)
 
 
