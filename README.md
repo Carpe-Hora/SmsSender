@@ -40,7 +40,7 @@ Just create a `composer.json` file for your project:
 ```json
 {
     "require": {
-        "Carpe-Hora/SmsSender": "dev-master"
+        "Carpe-Hora/SmsSender": "~1.0"
     }
 }
 ```
