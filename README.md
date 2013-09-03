@@ -22,7 +22,7 @@ Currently, there are the following adapters:
 
 _Providers_ contain the logic to extract useful information.
 
-Currently, there are only two providers:
+Currently, there are only three providers:
 
 * [Esendex](http://www.esendex.fr/)
 * [Nexmo](http://www.nexmo.com/)
