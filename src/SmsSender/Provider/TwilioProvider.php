@@ -11,7 +11,6 @@
 namespace SmsSender\Provider;
 
 use SmsSender\HttpAdapter\HttpAdapterInterface;
-use SmsSender\Provider\ProviderInterface;
 use SmsSender\Result\ResultInterface;
 
 /**
