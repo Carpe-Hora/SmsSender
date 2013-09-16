@@ -15,7 +15,7 @@ use SmsSender\Result\ResultInterface;
 use SmsSender\Result\Sms;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class SmsSender implements SmsSenderInterface
 {

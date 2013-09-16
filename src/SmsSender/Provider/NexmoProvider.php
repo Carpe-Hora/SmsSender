@@ -14,7 +14,7 @@ use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class NexmoProvider extends AbstractProvider
 {
@@ -108,7 +108,7 @@ class NexmoProvider extends AbstractProvider
      * Builds the parameters list to send to the API.
      *
      * @return array
-     * @author Kevin Gomez <kevin_gomez@carpe-hora.com>
+     * @author Kevin Gomez <contact@kevingomez.fr>
      */
     public function getParameters(array $additionnal_parameters = array())
     {

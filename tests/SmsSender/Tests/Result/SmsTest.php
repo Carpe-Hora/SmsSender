@@ -7,7 +7,7 @@ use SmsSender\Result\ResultInterface;
 use SmsSender\Tests\TestCase;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class SmsTest extends TestCase
 {

@@ -14,7 +14,7 @@ use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class TwilioProvider extends AbstractProvider
 {

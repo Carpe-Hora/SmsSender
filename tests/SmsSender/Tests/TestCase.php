@@ -3,7 +3,7 @@
 namespace SmsSender\Tests;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class TestCase extends \PHPUnit_Framework_TestCase
 {

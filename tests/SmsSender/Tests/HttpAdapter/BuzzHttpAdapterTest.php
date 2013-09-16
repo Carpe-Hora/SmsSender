@@ -7,7 +7,7 @@ use SmsSender\Tests\TestCase;
 use SmsSender\HttpAdapter\BuzzHttpAdapter;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class BuzzHttpAdapterTest extends TestCase
 {

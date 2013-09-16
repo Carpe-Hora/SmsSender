@@ -13,7 +13,7 @@ namespace SmsSender\HttpAdapter;
 use Buzz\Browser;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class BuzzHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterface
 {

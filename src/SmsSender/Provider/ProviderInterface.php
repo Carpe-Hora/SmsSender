@@ -11,7 +11,7 @@
 namespace SmsSender\Provider;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 interface ProviderInterface
 {

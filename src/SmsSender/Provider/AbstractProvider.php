@@ -14,7 +14,7 @@ use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 abstract class AbstractProvider implements ProviderInterface
 {
@@ -90,7 +90,7 @@ abstract class AbstractProvider implements ProviderInterface
      * @param string $string The string to test.
      *
      * @return bool
-     * @author Kevin Gomez <kevin_gomez@carpe-hora.com>
+     * @author Kevin Gomez <contact@kevingomez.fr>
      */
     protected function containsUnicode($string)
     {
@@ -105,7 +105,7 @@ abstract class AbstractProvider implements ProviderInterface
      * @param string $prefix The prefix to use.
      *
      * @return string The fixed phone number;
-     * @author Kevin Gomez <kevin_gomez@carpe-hora.com>
+     * @author Kevin Gomez <contact@kevingomez.fr>
      */
     protected function localNumberToInternational($number, $prefix)
     {

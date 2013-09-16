@@ -11,7 +11,7 @@
 namespace SmsSender\Result;
 
 /**
- * @author Kévin Gomez <kevin_gomez@carpe-hora.com>
+ * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class Sms implements ResultInterface, \ArrayAccess
 {
@@ -138,7 +138,7 @@ class Sms implements ResultInterface, \ArrayAccess
      * Returns a list of the valid status.
      *
      * @return array
-     * @author Kevin Gomez <kevin_gomez@carpe-hora.com>
+     * @author Kevin Gomez <contact@kevingomez.fr>
      */
     public function getValidStatus()
     {
