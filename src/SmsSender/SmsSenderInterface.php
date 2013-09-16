@@ -22,7 +22,7 @@ interface SmsSenderInterface
      * @param string $body       The message to send.
      * @param string $originator The name of the person which sends the message.
      *
-     * @return \SmsSender\Result\Sms A Sms result object.
+     * @return \SmsSender\Result\ResultInterface A Sms result object.
      */
     public function send($recipient, $body, $originator = '');
 }

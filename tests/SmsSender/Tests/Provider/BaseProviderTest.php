@@ -17,7 +17,6 @@ abstract class BaseProviderTest extends TestCase
 {
     abstract protected function getProvider($adapter);
 
-
     /**
      * @dataProvider invalidBodyProvider
      */

@@ -146,6 +146,7 @@ class Sms implements ResultInterface, \ArrayAccess
             ResultInterface::STATUS_SENT,
             ResultInterface::STATUS_DELIVERED,
             ResultInterface::STATUS_FAILED,
+            ResultInterface::STATUS_QUEUED,
         );
     }
 

@@ -118,4 +118,24 @@ class SmsTest extends TestCase
         unset($this->sms['id']);
         $this->assertFalse(isset($this->sms['id']));
     }
+
+    /**
+     * @dataProvider isSentDataProvider
+     */
+    public function testIsSent($status, $sent)
+    {
+        $this->sms->fromArray(array('status' => $status));
+
+        $this->assertSame($sent, $this->sms->isSent());
+    }
+
+    public function isSentDataProvider()
+    {
+        return array(
+            array(ResultInterface::STATUS_SENT,         true),
+            array(ResultInterface::STATUS_DELIVERED,    true),
+            array(ResultInterface::STATUS_FAILED,       false),
+            array(ResultInterface::STATUS_QUEUED,       false),
+        );
+    }
 }

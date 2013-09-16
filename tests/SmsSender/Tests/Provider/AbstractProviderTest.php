@@ -4,7 +4,6 @@ namespace SmsSender\Tests\Provider;
 
 use SmsSender\Tests\TestCase;
 
-use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Provider\AbstractProvider;
 use SmsSender\Result\ResultInterface;
 

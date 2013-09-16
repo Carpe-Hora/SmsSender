@@ -31,6 +31,11 @@ interface ResultInterface
     const STATUS_FAILED = 'failed';
 
     /**
+     * The message is not sent yet.
+     */
+    const STATUS_QUEUED = 'queued';
+
+    /**
      * Tells if the sms was sent.
      *
      * @return bool
