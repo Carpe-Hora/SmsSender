@@ -65,7 +65,10 @@ class SingleRecipientSender implements SmsSenderInterface
     public function __call($name, $arguments)
     {
         if (is_callable(array($this->smsSender, $name))) {
-            return call_user_func(array($this->smsSender, $name), $arguments);
+            $result = call_user_func_array(array($this->smsSender, $name), $arguments);
+
+            // don't break fluid interfaces
+            return $result instanceof SmsSenderInterface ? $this : $result;
         }
     }
 }
