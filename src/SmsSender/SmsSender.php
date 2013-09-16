@@ -22,7 +22,7 @@ class SmsSender implements SmsSenderInterface
     /**
      * Version
      */
-    const VERSION = '1.1.0';
+    const VERSION = '1.1.1-dev';
 
     /**
      * @var array
