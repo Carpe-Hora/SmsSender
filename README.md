@@ -193,6 +193,37 @@ $result = $singleRecipientSender>send('0642424242', 'It\'s the answer.', 'Kévin
 ```
 
 
+Delayed sendings
+----------------
+
+By default, SmsSender sends messages right when you call the `send` method.
+However, if you want to avoid the performance hit of the communication between
+SmsSender and the SMS providers, you can choose to use a "delayed sender".
+
+This sender works by putting the messages in a pool instead of sending them
+directly. This means you can for instance wait until the response is streamed to
+the user before really send the messages.
+
+Currently, the supported pool is a `MemoryPool`. Here is an example of how to
+set it up:
+
+```php
+<?php
+
+$sender = new \SmsSender\SmsSender();
+$sender->registerProvider(new \SmsSender\Provider\DummyProvider());
+
+$pool = new \SmsSender\Pool\MemoryPool();
+
+$delayedSender = new \SmsSender\DelayedSender($sender, $pool);
+
+$delayedSender->send('0601010101', 'foo'); // nothing is sent here, the message is only queued
+$delayedSender->send('0601010102', 'bar'); // same here
+
+$results = $delayedSender->flush(); // the two previous message are sent here
+```
+
+
 Extending Things
 ----------------
 
