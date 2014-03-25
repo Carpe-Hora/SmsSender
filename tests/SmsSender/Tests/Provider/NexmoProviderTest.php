@@ -75,7 +75,7 @@ EOF;
                 $this->anything(),      // URL
                 $this->equalTo('POST'), // method
                 $this->anything(),      // headers
-                $this->callback(function($data) use ($expectedRecipient) {
+                $this->callback(function ($data) use ($expectedRecipient) {
                     return !empty($data['to']) && $data['to'] === $expectedRecipient;
                 })
             );
@@ -116,7 +116,7 @@ EOF;
                 $this->anything(),      // URL
                 $this->equalTo('POST'), // method
                 $this->anything(),      // headers
-                $this->callback(function($data) use ($expectedType) {
+                $this->callback(function ($data) use ($expectedType) {
                     return !empty($data['type']) && $data['type'] === $expectedType;
                 })
             );

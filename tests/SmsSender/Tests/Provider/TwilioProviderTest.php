@@ -75,7 +75,7 @@ EOF;
                 $this->anything(),      // URL
                 $this->equalTo('POST'), // method
                 $this->anything(),      // headers
-                $this->callback(function($data) use ($expectedRecipient) {
+                $this->callback(function ($data) use ($expectedRecipient) {
                     return !empty($data['To']) && $data['To'] === $expectedRecipient;
                 })
             );
