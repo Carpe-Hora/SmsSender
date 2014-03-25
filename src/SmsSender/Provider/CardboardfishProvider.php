@@ -32,11 +32,6 @@ class CardboardfishProvider extends AbstractProvider
     /**
      * @var string
      */
-    // const SMS_STATUS_URL = '';
-
-    /**
-     * @var string
-     */
     protected $username;
 
     /**
@@ -85,7 +80,6 @@ class CardboardfishProvider extends AbstractProvider
             'SA' => $originator,
             'UR' => $user_ref,
             'M'  => $this->getMessage($body),
-            // 'M'  => urlencode(self::GSMEncode($body)),
         ));
 
         return $this->executeQuery(self::SEND_SMS_URL, $params, array(
@@ -111,7 +105,6 @@ class CardboardfishProvider extends AbstractProvider
      */
     protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
     {
-        // $res = $this->getAdapter()->getContent($url, 'GET', $headers = array(), $data);
         $res = $this->getAdapter()->getContent($url, 'POST', $headers = array(), $data);
         if (null === $res) {
             return array_merge($this->getDefaults(), $extra_result_data);
@@ -291,6 +284,7 @@ class CardboardfishProvider extends AbstractProvider
         if ('ERR' !== substr($result, 0, 3)) {
             return;
         }
+
         switch ($result) {
             case 'ERR -5':
                 throw new Exception('Not Enough Credit');
@@ -341,6 +335,7 @@ class CardboardfishProvider extends AbstractProvider
                     continue;
                 }
                 $arr = explode(':', $sms);
+
                 $ret[] = array(
                     'type'        => 'INCOMING',
                     'msgid'       => $arr[0],
