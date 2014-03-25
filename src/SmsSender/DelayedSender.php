@@ -33,7 +33,7 @@ class DelayedSender implements DelayedSenderInterface
      * @param SmsSenderInterface $smsSender An instance of SmsSenderInterface
      *                                      to decorate with a delayed sending
      *                                      strategy.
-     * @param Poolinterface $recipient The pool to use.
+     * @param Poolinterface      $recipient The pool to use.
      */
     public function __construct(SmsSenderInterface $smsSender, PoolInterface $pool)
     {
