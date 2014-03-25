@@ -245,7 +245,7 @@ class CardboardfishProvider extends AbstractProvider
         }
         if (false !== $res = $this->checkForStatusResult($result)) {
             return array_merge($this->getDefaults(), $extra_result_data, array(
-                'status' => ResultInterface::STATUS_INO,
+                'status' => ResultInterface::STATUS_INFO,
                 'status_info' => $res
             ));
         }
@@ -256,12 +256,12 @@ class CardboardfishProvider extends AbstractProvider
         );
         $arr = explode(' ', $result);
         if (3 === count($arr)) {
-            // OK 375055 UR:LO_5
+            // eg. OK 375055 UR:LO_5
             list($_, $ref) = explode(':', $arr[2]);
             $sms_data['id'] = $arr[1];
             $sms_data['user_ref'] = $ref;
         } elseif (2 === count($arr)) {
-            // OK 375056
+            // eg. OK 375056
             $sms_data['id'] = $arr[1];
         }
 
@@ -274,13 +274,6 @@ class CardboardfishProvider extends AbstractProvider
      */
     protected function checkForError($result)
     {
-        /*
-         * ERR -5  Not Enough Credit (402 Payment Required)
-         * ERR -10 Invalid Username or Password (401 Unauthorized)
-         * ERR -15 Invalid destination or destination not covered (503 Service Unavailable)
-         * ERR -20 System error, please retry (500 Internal Server Error)
-         * ERR -25 Request Error, Do Not Retry (400 Bad Request)
-         */
         if ('ERR' !== substr($result, 0, 3)) {
             return;
         }
@@ -329,7 +322,7 @@ class CardboardfishProvider extends AbstractProvider
 
         $ret = array();
         if ('INCOMING' === substr($result, 0, 8)) {
-            // INCOMING=2#1128173:447111111111:447000000000:1:0:1180019698:AF31C0D:#-1:447111111112:447000000003:1::1180019700::48656C6C6F
+            // eg. INCOMING=2#1128173:447111111111:447000000000:1:0:1180019698:AF31C0D:#-1:447111111112:447000000003:1::1180019700::48656C6C6F
             foreach (explode('#', $result) as $k => $sms) {
                 if (0 === $k) {
                     continue;
@@ -352,7 +345,7 @@ class CardboardfishProvider extends AbstractProvider
         }
 
         if (false !== strpos($result, '#')) {
-            /*
+            /* eg.
             1#
             -1:447111111112:447000000003:4::1180019702::00430061007200640042
             006f00610072006400460069007300680020002d00200054006800650020004

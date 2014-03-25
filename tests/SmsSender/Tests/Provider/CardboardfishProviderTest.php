@@ -49,7 +49,7 @@ class CardboardfishProviderTest extends BaseProviderTest
     {
         $status = array(
             'id'            => null,
-            'status'        => ResultInterface::STATUS_INO,
+            'status'        => ResultInterface::STATUS_INFO,
             'status_info'   => null,
         );
 

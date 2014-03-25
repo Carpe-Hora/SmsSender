@@ -38,7 +38,7 @@ interface ResultInterface
     /**
      * Status information.
      */
-    const STATUS_INO = 'info';
+    const STATUS_INFO = 'info';
 
     /**
      * Tells if the sms was sent.
