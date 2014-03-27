@@ -86,6 +86,24 @@ EOF;
         $this->assertSame($expected['error_code'], $result['error_code']);
     }
 
+    public function testStatusRequestNoExistingRef()
+    {
+        $api_data = <<<EOF
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<STATUSACK>
+    <GUID GUID="ke3rg342259821f440014czdy2RAPIDOSPOQ"></GUID>
+</STATUSACK>
+EOF;
+        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
+        $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOQ');
+        $expected = array(
+            'id'            => 'ke3rg342259821f440014czdy2RAPIDOSPOQ',
+            'status'        => -1,
+            'status_detail' => 'GUID not found',
+        );
+        $this->assertEquals($result, $expected);
+    }
+
     public function testStatusRequestSuccess()
     {
         $api_data = <<<EOF

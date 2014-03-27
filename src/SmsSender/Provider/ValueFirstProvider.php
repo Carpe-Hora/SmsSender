@@ -62,7 +62,12 @@ class ValueFirstProvider extends AbstractProvider
         }
 
         $xml = $this->getSrXml($messageId);
-        $res = $this->getAdapter()->getContent(self::SMS_STATUS_URL, 'POST', $headers = array(), array('action' => 'send', 'data' => $xml));
+        $res = $this->getAdapter()->getContent(
+            self::SMS_STATUS_URL,
+            'POST',
+            $headers = array(),
+            array('action' => 'status', 'data' => $xml)
+        );
 
         return $this->parseStatusXml($res, $messageId);
     }
@@ -423,6 +428,8 @@ class ValueFirstProvider extends AbstractProvider
     protected function getErrorMessage($code)
     {
         $errors = array(
+            -1    => 'GUID not found',
+
             // General
             0     => 'SMS submitted success NO',
             52992 => 'Username / Password incorrect',
@@ -528,6 +535,9 @@ class ValueFirstProvider extends AbstractProvider
         </STATUSACK>
         */
         try {
+            if(0 === $result->GUID->STATUS->count()) {
+                $this->getErrorMessage(-1);
+            }
             $this->getErrorMessage( (int) $result->GUID->STATUS['ERR'] );
         } catch(\Exception $e) {
             return array(
