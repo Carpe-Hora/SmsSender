@@ -73,6 +73,27 @@ class ValueFirstProvider extends AbstractProvider
     }
 
     /**
+     * @return array
+     * @throws RuntimeException if no credentials provided
+     */
+    public function getCredit()
+    {
+        if (null === $this->username || null === $this->password) {
+            throw new \RuntimeException('No API credentials provided');
+        }
+
+        $xml = $this->getCrXml();
+        $res = $this->getAdapter()->getContent(
+            self::SMS_STATUS_URL,
+            'POST',
+            $headers = array(),
+            array('action' => 'credits', 'data' => $xml)
+        );
+
+        return $this->parseCreditXml($res);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function send($recipient, $body, $originator = '', $user_ref = null)
@@ -182,26 +203,44 @@ class ValueFirstProvider extends AbstractProvider
     }
 
     /**
+     * Constructs valid XML for sending SMS-CR credit request service
+     * @return string
+     */
+    protected function getCrXml()
+    {
+        $xml = new \SimpleXMLElement(
+            '<?xml version="1.0" encoding="ISO-8859-1"?>'.
+            '<!DOCTYPE REQUESTCREDIT SYSTEM "http://127.0.0.1:80/psms/dtd/requestcredit.dtd">'.
+            '<REQUESTCREDIT></REQUESTCREDIT>'
+        );
+
+        $xml->addAttribute('USERNAME', $this->username);
+        $xml->addAttribute('PASSWORD', $this->password);
+
+        return $xml->asXml();
+    }
+
+    /**
      * Constructs valid XML for sending SMS-SR request service
      * @param  string $messageId
      * @return string
      */
     protected function getSrXml($messageId)
     {
-        $statusrequest = new \SimpleXMLElement(
+        $xml = new \SimpleXMLElement(
             '<?xml version="1.0" encoding="ISO-8859-1"?>'.
             '<!DOCTYPE STATUSREQUEST SYSTEM "http://127.0.0.1:80/psms/dtd/requeststatusv12.dtd">'.
             '<STATUSREQUEST VER="1.2"></STATUSREQUEST>'
         );
 
-        $user = $statusrequest->addChild('USER');
+        $user = $xml->addChild('USER');
         $user->addAttribute('USERNAME', $this->username);
         $user->addAttribute('PASSWORD', $this->password);
 
-        $guid = $statusrequest->addChild('GUID');
+        $guid = $xml->addChild('GUID');
         $guid->addAttribute('GUID', $messageId);
 
-        return $statusrequest->asXml();
+        return $xml->asXml();
     }
 
     /**
@@ -211,20 +250,20 @@ class ValueFirstProvider extends AbstractProvider
      */
     protected function getSmsMtXml(array $data = array())
     {
-        $message = new \SimpleXMLElement(
+        $xml = new \SimpleXMLElement(
             '<?xml version="1.0" encoding="ISO-8859-1"?>'.
             '<!DOCTYPE MESSAGE SYSTEM "http://127.0.0.1:80/psms/dtd/messagev12.dtd">'.
             '<MESSAGE VER="1.2"></MESSAGE>'
         );
 
-        $user = $message->addChild('USER');
+        $user = $xml->addChild('USER');
         foreach (array('USERNAME', 'PASSWORD') as $k) {
             if (isset($data[ $k ])) {
                 $user->addAttribute($k, $data[ $k ]);
             }
         }
 
-        $sms = $message->addChild('SMS');
+        $sms = $xml->addChild('SMS');
         foreach (array('UDH', 'CODING', 'PROPERTY', 'ID', 'TEXT', 'DLR', 'VALIDITY', 'SEND_ON') as $k) {
             if (isset($data[ $k ])) {
                 if ('TEXT' === $k) {
@@ -242,7 +281,7 @@ class ValueFirstProvider extends AbstractProvider
             }
         }
 
-        return $message->asXml();
+        return $xml->asXml();
     }
 
     /**
@@ -526,14 +565,7 @@ class ValueFirstProvider extends AbstractProvider
                 'error' => 'response is not a valid XML string',
             );
         }
-        /*
-        <?xml version="1.0" encoding="ISO-8859-1"?>
-        <STATUSACK>
-            <GUID GUID="ke3rg342259821f440014czdy2RAPIDOSPOR">
-                <STATUS SEQ="1" ERR="8448" DONEDATE="2014-03-27 16:34:34" REASONCODE="000" />
-            </GUID>
-        </STATUSACK>
-        */
+
         try {
             if(0 === $result->GUID->STATUS->count()) {
                 $this->getErrorMessage(-1);
@@ -546,5 +578,49 @@ class ValueFirstProvider extends AbstractProvider
                 'status_detail' => $e->getMessage(),
             );
         }
+    }
+
+    /**
+     * @param  string $xml
+     * @param  string $messageId
+     * @return array
+     */
+    protected function parseCreditXml($xml)
+    {
+        /*
+        <?xml version="1.0" encoding="ISO-8859-1"?>
+        <SMS-Credit User="rapidosports">
+            <Credit Limit="1000000" Used="4007.00"/>
+        </SMS-Credit>
+         */
+
+        /*
+        <?xml version="1.0" encoding="ISO-8859-1"?>
+        <SMS-Credit User="rapidoports">
+            <Err Code="52992" Desc="UserName Password Incorrect"/>
+        </SMS-Credit>
+         */
+        libxml_use_internal_errors(true);
+        if (false === $result = simplexml_load_string($xml)) {
+            return array(
+                'error' => 'response is not a valid XML string',
+            );
+        }
+        try {
+            if(0 !== $result->Err->count()) {
+                $this->getErrorMessage((int) $result->Err['Code']);
+            }
+        } catch(\Exception $e) {
+            return array(
+                'user' => (string) $result['User'],
+                'error' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+            );
+        }
+        return array(
+            'user' => (string) $result['User'],
+            'limit' => (int) $result->Credit['Limit'],
+            'used' => (int) $result->Credit['Used'],
+        );
     }
 }

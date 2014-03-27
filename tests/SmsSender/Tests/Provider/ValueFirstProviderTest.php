@@ -86,6 +86,42 @@ EOF;
         $this->assertSame($expected['error_code'], $result['error_code']);
     }
 
+    public function testStatusCreditSuccess()
+    {
+        $api_data = <<<EOF
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<SMS-Credit User="foo">
+    <Credit Limit="1000000" Used="4007.00"/>
+</SMS-Credit>
+EOF;
+        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
+        $result = $this->provider->getCredit();
+        $expected = array(
+            'user'  => 'foo',
+            'limit' => 1000000,
+            'used'  => 4007,
+        );
+        $this->assertEquals($result, $expected);
+    }
+
+    public function testStatusCreditWrongCredentials()
+    {
+        $api_data = <<<EOF
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<SMS-Credit User="foo">
+    <Err Code="52992" Desc="UserName Password Incorrect"/>
+</SMS-Credit>
+EOF;
+        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
+        $result = $this->provider->getCredit();
+        $expected = array(
+            'user'       => 'foo',
+            'error'      => 'Username / Password incorrect',
+            'error_code' => 52992,
+        );
+        $this->assertEquals($result, $expected);
+    }
+
     public function testStatusRequestNoExistingRef()
     {
         $api_data = <<<EOF
