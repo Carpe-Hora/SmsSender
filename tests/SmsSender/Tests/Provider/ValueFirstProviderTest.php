@@ -86,12 +86,46 @@ EOF;
         $this->assertSame($expected['error_code'], $result['error_code']);
     }
 
+    public function testStatusRequestSuccess()
+    {
+        $api_data = <<<EOF
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<STATUSACK>
+    <GUID GUID="ke3rg342259821f440014czdy2RAPIDOSPOR">
+        <STATUS SEQ="1" ERR="8448" DONEDATE="2014-03-27 16:34:34" REASONCODE="000" />
+    </GUID>
+</STATUSACK>
+EOF;
+        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
+        $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR');
+        $expected = array(
+            'id'            => 'ke3rg342259821f440014czdy2RAPIDOSPOR',
+            'status'        => 8448,
+            'status_detail' => 'Message delivered successfully',
+        );
+        $this->assertEquals($result, $expected);
+    }
+
+    public function testStatusRequestFail()
+    {
+        $api_data = '';
+        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
+        $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR');
+        $expected = array(
+            'id'    => 'ke3rg342259821f440014czdy2RAPIDOSPOR',
+            'error' => 'response is not a valid XML string',
+        );
+        $this->assertEquals($result, $expected);
+    }
+
     public function testPostMessageError()
     {
         $api_data = <<<EOF
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <MESSAGEACK>
-    <GUID GUID="ke3ql554883131f440014p89lcRAPIDOSPOR" SUBMITDATE="2014-03-26 21:55:48" ID="1"><ERROR SEQ="1" CODE="28682" /></GUID>
+    <GUID GUID="ke3ql554883131f440014p89lcRAPIDOSPOR" SUBMITDATE="2014-03-26 21:55:48" ID="1">
+        <ERROR SEQ="1" CODE="28682" />
+    </GUID>
 </MESSAGEACK>
 EOF;
         $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');

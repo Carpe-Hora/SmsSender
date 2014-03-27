@@ -27,7 +27,7 @@ class ValueFirstProvider extends AbstractProvider
     /**
      * @var string
      */
-    const SMS_STATUS_URL = '.';
+    const SMS_STATUS_URL = 'http://api.myvaluefirst.com/psms/servlet/psms.Eservice2';
 
     /**
      * @var string
@@ -51,20 +51,20 @@ class ValueFirstProvider extends AbstractProvider
     }
 
     /**
-     * Retrieves the queued delivery receipts
-     *
+     * @param string $messageId
      * @return array
      * @throws RuntimeException if no credentials provided
      */
-    public function getStatus()
+    public function getStatus($messageId)
     {
         if (null === $this->username || null === $this->password) {
             throw new \RuntimeException('No API credentials provided');
         }
 
-        $params = $this->getParameters(array());
+        $xml = $this->getSrXml($messageId);
+        $res = $this->getAdapter()->getContent(self::SMS_STATUS_URL, 'POST', $headers = array(), array('action' => 'send', 'data' => $xml));
 
-        return $this->executeQuery(self::SMS_STATUS_URL, $params);
+        return $this->parseStatusXml($res, $messageId);
     }
 
     /**
@@ -89,7 +89,9 @@ class ValueFirstProvider extends AbstractProvider
         }
         $params = $this->getParameters($params);
 
-        return $this->executeQuery(self::SEND_SMS_URL, $params, array(
+        $xml = $this->getSmsMtXml($params);
+
+        return $this->executeQuery(self::SEND_SMS_URL, $xml, array(
             'recipient'  => $recipient,
             'body'       => $body,
             'originator' => $originator,
@@ -106,13 +108,12 @@ class ValueFirstProvider extends AbstractProvider
 
     /**
      * @param  string $url
-     * @param  array  $data
+     * @param  string $xml
      * @param  array  $extra_result_data
      * @return array
      */
-    protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
+    protected function executeQuery($url, $xml, array $extra_result_data = array())
     {
-        $xml = $this->getSmsMtXml($data);
         $res = $this->getAdapter()->getContent($url, 'POST', $headers = array(), array('action' => 'send', 'data' => $xml));
 
         if (null === $res) {
@@ -173,6 +174,29 @@ class ValueFirstProvider extends AbstractProvider
         }
 
         return implode('', $ret);
+    }
+
+    /**
+     * Constructs valid XML for sending SMS-SR request service
+     * @param  string $messageId
+     * @return string
+     */
+    protected function getSrXml($messageId)
+    {
+        $statusrequest = new \SimpleXMLElement(
+            '<?xml version="1.0" encoding="ISO-8859-1"?>'.
+            '<!DOCTYPE STATUSREQUEST SYSTEM "http://127.0.0.1:80/psms/dtd/requeststatusv12.dtd">'.
+            '<STATUSREQUEST VER="1.2"></STATUSREQUEST>'
+        );
+
+        $user = $statusrequest->addChild('USER');
+        $user->addAttribute('USERNAME', $this->username);
+        $user->addAttribute('PASSWORD', $this->password);
+
+        $guid = $statusrequest->addChild('GUID');
+        $guid->addAttribute('GUID', $messageId);
+
+        return $statusrequest->asXml();
     }
 
     /**
@@ -454,5 +478,63 @@ class ValueFirstProvider extends AbstractProvider
         }
 
         return false;
+    }
+
+    /**
+     * @param  string $xml
+     * @param  string $messageId
+     * @return array
+     */
+    protected function parseStatusXml($xml, $messageId)
+    {
+        /*
+        GUID
+            A globally unique Message ID that is generated for each <SMS> tag.
+            This GUID is generated when ValueFirst Pace receives a new session.
+        SEQ
+            The address (Mobile No.) SEQ ID (Client side value) whose status was queried
+        DONEDATE
+            The time when the new status was received.
+            The new status could be either success or failure,
+            the field is in Standard ANSI format, i.e. YYYY- MM-DD HH:MM:SS
+        ERR
+            Error / Message Status Code,
+            if no standard error occurred, the ERR shall be either one of the following value.
+                8448: Message was successfully delivered on DONEDATE
+                8449: Message reportedly failed on DONEDATE
+        REASONCODE
+            In case of failure (8449) service returns reason code for message failure.
+            This is a value provided by SMSC and differs for each SMSC route.
+            Customers are required to contact ValueFirst to discuss various reason code and
+            corresponding meaning for different country.
+            Reason-code is an optional variable.
+            Note: If a message delivery is tried on a user handset whose number exists in DNC,
+            the messages will fail immediately with error-code 999.
+            ValueFirst will not charge any credits for such events.
+        */
+        libxml_use_internal_errors(true);
+        if (false === $result = simplexml_load_string($xml)) {
+            return array(
+                'id' => $messageId,
+                'error' => 'response is not a valid XML string',
+            );
+        }
+        /*
+        <?xml version="1.0" encoding="ISO-8859-1"?>
+        <STATUSACK>
+            <GUID GUID="ke3rg342259821f440014czdy2RAPIDOSPOR">
+                <STATUS SEQ="1" ERR="8448" DONEDATE="2014-03-27 16:34:34" REASONCODE="000" />
+            </GUID>
+        </STATUSACK>
+        */
+        try {
+            $this->getErrorMessage( (int) $result->GUID->STATUS['ERR'] );
+        } catch(\Exception $e) {
+            return array(
+                'id' => $messageId,
+                'status' => (int) $e->getCode(),
+                'status_detail' => $e->getMessage(),
+            );
+        }
     }
 }
