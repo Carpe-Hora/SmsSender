@@ -25,11 +25,12 @@ Currently, there are the following adapters:
 
 _Providers_ contain the logic to extract useful information.
 
-Currently, there are only three providers:
+Currently, there are only four providers:
 
 * [Esendex](http://www.esendex.fr/)
 * [Nexmo](http://www.nexmo.com/)
 * [Twilio](https://www.twilio.com/)
+* [CardBoardFish](http://www.cardboardfish.com/)
 
 Installation
 ------------
