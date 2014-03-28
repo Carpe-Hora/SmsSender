@@ -5,6 +5,7 @@ namespace SmsSender\Tests\Pool;
 use SmsSender\Pool\MemoryPool;
 use SmsSender\Result\Sms;
 use SmsSender\Result\ResultInterface;
+use SmsSender\Tests\TestCase;
 
 /**
  * @author Kévin Gomez <contact@kevingomez.fr>
