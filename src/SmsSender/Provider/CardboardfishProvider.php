@@ -62,6 +62,7 @@ class CardboardfishProvider extends AbstractProvider
         }
 
         $res = $this->getAdapter()->getContent(self::SMS_STATUS_URL, 'POST', $headers = array(), $this->getParameters());
+
         return $this->parseStatusResults($res);
     }
 
@@ -220,8 +221,8 @@ class CardboardfishProvider extends AbstractProvider
     /**
      * Parses the data returned by the API for a "status" request.
      *
-     * @param  string    $result            The raw result string.
-     * @param  array     $extra_result_data
+     * @param string $result            The raw result string.
+     * @param array  $extra_result_data
      *
      * @return array
      */
@@ -237,8 +238,8 @@ class CardboardfishProvider extends AbstractProvider
     /**
      * Parses the data returned by the API for a "send" request.
      *
-     * @param  string    $result            The raw result string.
-     * @param  array     $extra_result_data
+     * @param string $result            The raw result string.
+     * @param array  $extra_result_data
      *
      * @return array
      */

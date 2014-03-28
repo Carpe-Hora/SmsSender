@@ -18,15 +18,16 @@ interface HttpAdapterInterface
     /**
      * Returns the content fetched from a given URL.
      *
-     * @param string $url     URL.
-     * @param string $method  HTTP method to use for the request.
-     * @param array  $headers Additionnal headers to send with the request.
-     *                        The headers array should look like this:
-     *                          array(
-     *                            'Content-type: text/plain',
-     *                            'Content-length: 100'
-     *                          )
-     * @param  array  $data The data to send when doing non "get" requests.
+     * @param  string $url     URL.
+     * @param  string $method  HTTP method to use for the request.
+     * @param  array  $headers Additionnal headers to send with the request.
+     *                         The headers array should look like this:
+     *                         array(
+     *                              'Content-type: text/plain',
+     *                              'Content-length: 100'
+     *                         )
+     * @param  array  $data    The data to send when doing non "get" requests.
+     *
      * @return string
      */
     public function getContent($url, $method = 'GET', array $headers = array(), array $data = array());

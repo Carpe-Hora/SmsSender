@@ -1,6 +1,6 @@
 <?php
 
-namespace SmsSender\Tests;
+namespace SmsSender\Tests\Pool;
 
 use SmsSender\Pool\MemoryPool;
 use SmsSender\Result\Sms;

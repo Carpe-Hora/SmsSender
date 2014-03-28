@@ -31,8 +31,8 @@ class SingleRecipientSender implements SmsSenderInterface
 
     /**
      * @param \SmsSender\SmsSenderInterface $smsSender An instance of SmsSenderInterface
-     *                                                      to decorate with a single recipient strategy.
-     * @param string $recipient Recipient phonenumber.
+     *                                                 to decorate with a single recipient strategy.
+     * @param string                        $recipient Recipient phonenumber.
      */
     public function __construct(SmsSenderInterface $smsSender, $recipient)
     {
