@@ -51,7 +51,7 @@ class ValueFirstProvider extends AbstractProvider
     }
 
     /**
-     * @param string $messageId
+     * @param  string           $messageId
      * @return array
      * @throws RuntimeException if no credentials provided
      */
@@ -101,6 +101,7 @@ class ValueFirstProvider extends AbstractProvider
         if (null === $this->username || null === $this->password) {
             throw new \RuntimeException('No API credentials provided');
         }
+        $recipient = (int) $recipient;
         $this->validateRecipient($recipient);
 
         $params = array(
@@ -417,7 +418,6 @@ class ValueFirstProvider extends AbstractProvider
         }
         if (false !== $res = $this->checkForStatusResult($result)) {
             return array_merge($this->getDefaults(), $extra_result_data, array(
-                'status' => ResultInterface::STATUS_INFO,
                 'status_info' => $res
             ));
         }
@@ -567,14 +567,15 @@ class ValueFirstProvider extends AbstractProvider
         }
 
         try {
-            if(0 === $result->GUID->STATUS->count()) {
+            if (0 === $result->GUID->STATUS->count()) {
                 $this->getErrorMessage(-1);
             }
             $this->getErrorMessage( (int) $result->GUID->STATUS['ERR'] );
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return array(
                 'id' => $messageId,
-                'status' => (int) $e->getCode(),
+                'status' => 8448 === (int) $e->getCode() || 13568 === (int) $e->getCode() ? ResultInterface::STATUS_SENT : ResultInterface::STATUS_FAILED,
+                'status_code' => (int) $e->getCode(),
                 'status_detail' => $e->getMessage(),
             );
         }
@@ -607,16 +608,17 @@ class ValueFirstProvider extends AbstractProvider
             );
         }
         try {
-            if(0 !== $result->Err->count()) {
+            if (0 !== $result->Err->count()) {
                 $this->getErrorMessage((int) $result->Err['Code']);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return array(
                 'user' => (string) $result['User'],
                 'error' => $e->getMessage(),
                 'error_code' => $e->getCode(),
             );
         }
+
         return array(
             'user' => (string) $result['User'],
             'limit' => (int) $result->Credit['Limit'],
