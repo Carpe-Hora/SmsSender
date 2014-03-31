@@ -23,10 +23,11 @@ interface HttpAdapterInterface
      * @param  array  $headers Additionnal headers to send with the request.
      *                         The headers array should look like this:
      *                         array(
-     *                             'Content-type: text/plain',
-     *                             'Content-length: 100'
+     *                              'Content-type: text/plain',
+     *                              'Content-length: 100'
      *                         )
      * @param  array  $data    The data to send when doing non "get" requests.
+     *
      * @return string
      */
     public function getContent($url, $method = 'GET', array $headers = array(), array $data = array());

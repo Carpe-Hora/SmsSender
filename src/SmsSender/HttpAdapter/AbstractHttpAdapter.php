@@ -18,7 +18,8 @@ class AbstractHttpAdapter
     /**
      * Generate URL-encoded query string from an array.
      *
-     * @param  array  $data The data to send.
+     * @param array $data The data to send.
+     *
      * @return string
      */
     protected function encodePostData(array $data = array())

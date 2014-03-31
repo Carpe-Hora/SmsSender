@@ -28,15 +28,13 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
 
         // build the request...
         curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($c, CURLOPT_URL, $url);
         curl_setopt($c, CURLOPT_FOLLOWLOCATION, 1); // allow redirects.
         curl_setopt($c, CURLOPT_CUSTOMREQUEST, strtoupper($method)); // define the HTTP method
 
         // join the data
         if (!empty($data) && 'POST' === strtoupper($method)) {
-            curl_setopt($c, CURLOPT_URL, $url);
             curl_setopt($c, CURLOPT_POSTFIELDS, $this->encodePostData($data));
-        } elseif (!empty($data) && 'GET' === strtoupper($method)) {
-            curl_setopt($c, CURLOPT_URL, $url.'?'.$this->encodePostData($data));
         }
 
         // and add the headers

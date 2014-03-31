@@ -47,18 +47,12 @@ class CardboardfishProviderTest extends BaseProviderTest
 
     public function statusDataprovider()
     {
-        $status = array(
-            'id'            => null,
-            'status'        => ResultInterface::STATUS_INFO,
-            'status_info'   => null,
-        );
-
         return array(
-            array('0#', array_merge($status, array('status_info' => 'no message in queue'))),
+            array('0#', 'no message in queue'),
             array('INCOMING=2'.
                     '#1128173:447111111111:447000000000:1:0:1180019698:AF31C0D:'.
                     '#-1:447111111112:447000000003:1::1180019700::48656C6C6F',
-                    array_merge($status, array('status_info' => array(
+                    array(
                         array(
                             'type'        => 'INCOMING',
                             'msgid'       => '1128173',
@@ -79,7 +73,7 @@ class CardboardfishProviderTest extends BaseProviderTest
                             'datetime'    => '1180019700',
                             'user_ref'    => '',
                         )
-                    )))
+                    )
             ),
             array('1#'.
                     '-1:447111111112:447000000003:4::1180019702::00430061007200640042'.
@@ -87,7 +81,7 @@ class CardboardfishProviderTest extends BaseProviderTest
                     'e006500780074002000470065006e00650072006100740069006f006e002000'.
                     '6f00660020004d006f00620069006c00650020004d006500730073006100670'.
                     '069006e0067',
-                    array_merge($status, array('status_info' => array(
+                    array(
                         array(
                             'type'        => 'INCOMING',
                             'source'      => '447111111112',
@@ -97,7 +91,7 @@ class CardboardfishProviderTest extends BaseProviderTest
                             'udh'         => '',
                             'message'     => '00430061007200640042006f00610072006400460069007300680020002d00200054006800650020004e006500780074002000470065006e00650072006100740069006f006e0020006f00660020004d006f00620069006c00650020004d006500730073006100670069006e0067',
                         )
-                    )))
+                    )
             ),
         );
     }
@@ -130,9 +124,7 @@ class CardboardfishProviderTest extends BaseProviderTest
             'originator'    => '',
         );
 
-        $api_data = <<<EOF
-OK 1043333914
-EOF;
+        $api_data = 'OK 1043333914';
 
         return array(
             array($number, $msg, '',          null,        $sms),

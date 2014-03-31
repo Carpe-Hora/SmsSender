@@ -61,9 +61,9 @@ class CardboardfishProvider extends AbstractProvider
             throw new \RuntimeException('No API credentials provided');
         }
 
-        $params = $this->getParameters(array());
+        $res = $this->getAdapter()->getContent(self::SMS_STATUS_URL, 'POST', $headers = array(), $this->getParameters());
 
-        return $this->executeQuery(self::SMS_STATUS_URL, $params);
+        return $this->parseStatusResults($res);
     }
 
     /**
@@ -80,13 +80,21 @@ class CardboardfishProvider extends AbstractProvider
             'SA' => $originator,
             'UR' => $user_ref,
             'M'  => $this->getMessage($body),
+            // 'M'  => urlencode(self::GSMEncode($body)),
         ));
-
-        return $this->executeQuery(self::SEND_SMS_URL, $params, array(
+        $extra_result_data = array(
             'recipient'  => $recipient,
             'body'       => $body,
             'originator' => $originator,
-        ));
+        );
+
+        $res = $this->getAdapter()->getContent(self::SEND_SMS_URL, 'POST', $headers = array(), $params);
+
+        if (null === $res) {
+            return array_merge($this->getDefaults(), $extra_result_data);
+        }
+
+        return $this->parseSendResults($res, $extra_result_data);
     }
 
     /**
@@ -98,27 +106,11 @@ class CardboardfishProvider extends AbstractProvider
     }
 
     /**
-     * @param  string $url
-     * @param  array  $data
-     * @param  array  $extra_result_data
-     * @return array
-     */
-    protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
-    {
-        $res = $this->getAdapter()->getContent($url, 'POST', $headers = array(), $data);
-        if (null === $res) {
-            return array_merge($this->getDefaults(), $extra_result_data);
-        }
-
-        return $this->parseResults($res, $extra_result_data);
-    }
-
-    /**
      * Builds the parameters list to send to the API.
      *
      * @return array
      */
-    public function getParameters(array $additionnal_parameters = array())
+    protected function getParameters(array $additionnal_parameters = array())
     {
         return array_filter(
             array_merge(array(
@@ -227,27 +219,38 @@ class CardboardfishProvider extends AbstractProvider
     }
 
     /**
-     * Parses the data returned by the API.
+     * Parses the data returned by the API for a "status" request.
      *
-     * @param  string    $result            The raw result string.
-     * @param  array     $extra_result_data
+     * @param string $result            The raw result string.
+     * @param array  $extra_result_data
+     *
      * @return array
-     * @throws Exception if error code found
      */
-    protected function parseResults($result, array $extra_result_data = array())
+    protected function parseStatusResults($result, array $extra_result_data = array())
+    {
+        $result = trim($result);
+
+        $this->checkForError($result);
+
+        return $this->checkForStatusResult($result);
+    }
+
+    /**
+     * Parses the data returned by the API for a "send" request.
+     *
+     * @param string $result            The raw result string.
+     * @param array  $extra_result_data
+     *
+     * @return array
+     */
+    protected function parseSendResults($result, array $extra_result_data = array())
     {
         $result = trim($result);
 
         try {
             $this->checkForError($result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return array_merge($this->getDefaults(), $extra_result_data, array('error' => $e->getMessage()));
-        }
-        if (false !== $res = $this->checkForStatusResult($result)) {
-            return array_merge($this->getDefaults(), $extra_result_data, array(
-                'status' => ResultInterface::STATUS_INFO,
-                'status_info' => $res
-            ));
         }
 
         // The message was successfully sent!
@@ -309,6 +312,7 @@ class CardboardfishProvider extends AbstractProvider
         if ('0#' === $result) {
             return 'no message in queue';
         }
+
         $statuses = array(
             1  => 'DELIVERED', // Message delivered to handset.
             2  => 'BUFFERED', // Message buffered, usually because it failed first time and is now being retried.
@@ -327,14 +331,14 @@ class CardboardfishProvider extends AbstractProvider
                 if (0 === $k) {
                     continue;
                 }
-                $arr = explode(':', $sms);
 
+                $arr = explode(':', $sms);
                 $ret[] = array(
                     'type'        => 'INCOMING',
                     'msgid'       => $arr[0],
                     'source'      => $arr[1],
                     'destination' => $arr[2],
-                    'status'      => $statuses[ (int) $arr[3]],
+                    'status'      => $statuses[(int) $arr[3]],
                     'error_code'  => $arr[4],
                     'datetime'    => $arr[5],
                     'user_ref'    => $arr[6],
@@ -357,10 +361,13 @@ class CardboardfishProvider extends AbstractProvider
                 if (0 === $k) {
                     continue;
                 }
+
                 $arr = explode(':', $sms);
+
                 if ('-1' === $arr[0]) {
                     $tmp['type'] = 'INCOMING';
                 }
+
                 $tmp['source']      = $arr[1];
                 $tmp['destination'] = $arr[2];
                 $tmp['dcs']         = $arr[3]; // Data Coding Scheme
@@ -385,14 +392,11 @@ class CardboardfishProvider extends AbstractProvider
     protected function getMessage($message, $data_coding_scheme = null)
     {
         if (null === $data_coding_scheme || 1 === $data_coding_scheme) {
-            $data_coding_scheme = 6;
-
-            return urlencode($this->GSMEncode($message));
+            return urlencode(self::GSMEncode($message));
         }
-        if (0 === $data_coding_scheme) {
-            $data_coding_scheme = 7;
 
-            return urlencode($this->GSMEncode($message));
+        if (0 === $data_coding_scheme) {
+            return urlencode(self::GSMEncode($message));
         }
 
         return urlencode($message);
@@ -401,7 +405,7 @@ class CardboardfishProvider extends AbstractProvider
     /**
      * @param string $message
      */
-    private function GSMEncode($message)
+    protected static function GSMEncode($message)
     {
         $gsmchar = array (
             "\x0A" => "\x0A",
@@ -513,6 +517,7 @@ class CardboardfishProvider extends AbstractProvider
         $ret = '';
         foreach ($chars as $char) {
             preg_match("/[A-Za-z0-9!\/#%&\"=\-'<>\?\(\)\*\+\,\.;:]/", $char, $matches);
+
             if (isset($matches[0])) {
                 $ret.= $char;
             } else {
