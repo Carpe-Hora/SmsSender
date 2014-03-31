@@ -50,7 +50,6 @@ class ValueFirstProviderTest extends TestCase
     {
         $status = array(
             'id'            => null,
-            'status'        => ResultInterface::STATUS_INFO,
             'status_info'   => null,
         );
 
@@ -69,7 +68,7 @@ EOF;
         $result = $this->provider->send('9191000000', 'foo', '9999');
         $expected = array(
             'id'         => null,
-            'status'     => 'failed',
+            'status'     => ResultInterface::STATUS_FAILED,
             'recipient'  => '9191000000',
             'body'       => 'foo',
             'originator' => '9999',
@@ -134,7 +133,8 @@ EOF;
         $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOQ');
         $expected = array(
             'id'            => 'ke3rg342259821f440014czdy2RAPIDOSPOQ',
-            'status'        => -1,
+            'status'        => ResultInterface::STATUS_FAILED,
+            'status_code'   => -1,
             'status_detail' => 'GUID not found',
         );
         $this->assertEquals($result, $expected);
@@ -154,7 +154,8 @@ EOF;
         $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR');
         $expected = array(
             'id'            => 'ke3rg342259821f440014czdy2RAPIDOSPOR',
-            'status'        => 8448,
+            'status'        => ResultInterface::STATUS_SENT,
+            'status_code'   => 8448,
             'status_detail' => 'Message delivered successfully',
         );
         $this->assertEquals($result, $expected);
@@ -186,7 +187,7 @@ EOF;
         $result = $this->provider->send('9191000000', 'foo', '9999');
         $expected = array(
             'id'         => null,
-            'status'     => 'failed',
+            'status'     => ResultInterface::STATUS_FAILED,
             'recipient'  => '9191000000',
             'body'       => 'foo',
             'originator' => '9999',

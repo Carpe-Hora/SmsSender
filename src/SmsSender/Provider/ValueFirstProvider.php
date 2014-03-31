@@ -417,7 +417,6 @@ class ValueFirstProvider extends AbstractProvider
         }
         if (false !== $res = $this->checkForStatusResult($result)) {
             return array_merge($this->getDefaults(), $extra_result_data, array(
-                'status' => ResultInterface::STATUS_INFO,
                 'status_info' => $res
             ));
         }
@@ -574,7 +573,8 @@ class ValueFirstProvider extends AbstractProvider
         } catch(\Exception $e) {
             return array(
                 'id' => $messageId,
-                'status' => (int) $e->getCode(),
+                'status' => 8448 === (int) $e->getCode() || 13568 === (int) $e->getCode() ? ResultInterface::STATUS_SENT : ResultInterface::STATUS_FAILED,
+                'status_code' => (int) $e->getCode(),
                 'status_detail' => $e->getMessage(),
             );
         }
