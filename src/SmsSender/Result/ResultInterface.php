@@ -36,6 +36,11 @@ interface ResultInterface
     const STATUS_QUEUED = 'queued';
 
     /**
+     * Status information.
+     */
+    const STATUS_INFO = 'info';
+
+    /**
      * Tells if the sms was sent.
      *
      * @return bool

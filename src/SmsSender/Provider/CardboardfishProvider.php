@@ -249,6 +249,7 @@ class CardboardfishProvider extends AbstractProvider
 
         try {
             $this->checkForError($result);
+            $this->checkForOk($result);
         } catch (Exception $e) {
             return array_merge($this->getDefaults(), $extra_result_data, array('error' => $e->getMessage()));
         }
@@ -301,6 +302,18 @@ class CardboardfishProvider extends AbstractProvider
                 throw new Exception('Unknown Error');
                 break;
         }
+    }
+
+    /**
+     * @param  string    $result The raw result string.
+     * @throws Exception if error code found
+     */
+    protected function checkForOk($result)
+    {
+        if ('OK' === substr($result, 0, 2)) {
+            return;
+        }
+        throw new Exception('Unknown Error');
     }
 
     /**
