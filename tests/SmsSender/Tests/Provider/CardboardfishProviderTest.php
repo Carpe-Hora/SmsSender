@@ -96,6 +96,23 @@ class CardboardfishProviderTest extends BaseProviderTest
         );
     }
 
+    public function testSendFail()
+    {
+        $api_response = 'asdfasdfasdf';
+        $this->provider = new CardboardfishProvider($this->getMockAdapter(null, $api_response), 'username', 'pass');
+        $result = $this->provider->send('123', 'blabla', '456');
+
+        $expected_result = [
+            'id'         => null,
+            'status'     => 'failed',
+            'recipient'  => '123',
+            'body'       => 'blabla',
+            'originator' => '456',
+            'error'      => 'Unknown Error',
+        ];
+        $this->assertSame($expected_result, $result);
+    }
+
     /**
      * @dataProvider sendDataprovider
      */
