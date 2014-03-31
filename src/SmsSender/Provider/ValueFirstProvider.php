@@ -101,6 +101,7 @@ class ValueFirstProvider extends AbstractProvider
         if (null === $this->username || null === $this->password) {
             throw new \RuntimeException('No API credentials provided');
         }
+        $recipient = (int) $recipient;
         $this->validateRecipient($recipient);
 
         $params = array(
