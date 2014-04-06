@@ -10,6 +10,7 @@
 
 namespace SmsSender\Provider;
 
+use SmsSender\Exception as Exception;
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
 
@@ -61,7 +62,7 @@ class EsendexProvider extends AbstractProvider
     public function send($recipient, $body, $originator = '')
     {
         if (null === $this->username || null === $this->password || null === $this->accountRef) {
-            throw new \RuntimeException('No API credentials provided');
+            throw new Exception\InvalidCredentialsException('No API credentials provided');
         }
 
         $params = $this->getParameters(array(
@@ -87,7 +88,7 @@ class EsendexProvider extends AbstractProvider
     public function getStatus($messageId)
     {
         if (null === $this->username || null === $this->password || null === $this->accountRef) {
-            throw new \RuntimeException('No API credentials provided');
+            throw new Exception\InvalidCredentialsException('No API credentials provided');
         }
 
         $params = $this->getParameters(array(

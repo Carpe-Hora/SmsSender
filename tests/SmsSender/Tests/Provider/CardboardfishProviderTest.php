@@ -13,7 +13,7 @@ class CardboardfishProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
      */
     public function testSendWithNullApiCredentials()
@@ -24,7 +24,7 @@ class CardboardfishProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
      */
     public function testGetStatusWithNullApiCredentials()
@@ -107,7 +107,6 @@ class CardboardfishProviderTest extends BaseProviderTest
             'recipient'  => '123',
             'body'       => 'blabla',
             'originator' => '456',
-            'error'      => 'Unknown Error',
         );
         $this->assertSame($expected_result, $result);
     }

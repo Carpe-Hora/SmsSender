@@ -13,7 +13,7 @@ class NexmoProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
      */
     public function testSendWithNullApiCredentials()
@@ -24,7 +24,7 @@ class NexmoProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \BadMethodCallException
+     * @expectedException           \SmsSender\Exception\InvalidArgumentException
      * @expectedExceptionMessage    The originator parameter is required for this provider.
      */
     public function testSendWithNoOriginator()

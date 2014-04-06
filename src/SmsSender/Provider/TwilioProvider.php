@@ -10,6 +10,7 @@
 
 namespace SmsSender\Provider;
 
+use SmsSender\Exception as Exception;
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
 
@@ -56,11 +57,11 @@ class TwilioProvider extends AbstractProvider
     public function send($recipient, $body, $originator = '')
     {
         if (null === $this->accountSid || null === $this->authToken) {
-            throw new \RuntimeException('No API credentials provided');
+            throw new Exception\InvalidCredentialsException('No API credentials provided');
         }
 
         if (empty($originator)) {
-            throw new \BadMethodCallException('The originator parameter is required for this provider.');
+            throw new Exception\InvalidArgumentException('The originator parameter is required for this provider.');
         }
 
         // clean the originator string to ensure that the sms won't be

@@ -13,7 +13,7 @@ class EsendexProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
      */
     public function testSendWithNullApiCredentials()
@@ -24,7 +24,7 @@ class EsendexProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
      */
     public function testGetStatusWithNullApiCredentials()

@@ -10,9 +10,9 @@
 
 namespace SmsSender\Provider;
 
+use SmsSender\Exception as Exception;
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
-use Exception;
 
 /**
  * @author Kevin Saliou <kevin@saliou.name>
@@ -58,7 +58,7 @@ class CardboardfishProvider extends AbstractProvider
     public function getStatus()
     {
         if (null === $this->username || null === $this->password) {
-            throw new \RuntimeException('No API credentials provided');
+            throw new Exception\InvalidCredentialsException('No API credentials provided');
         }
 
         $res = $this->getAdapter()->getContent(self::SMS_STATUS_URL, 'POST', $headers = array(), $this->getParameters());
@@ -72,7 +72,7 @@ class CardboardfishProvider extends AbstractProvider
     public function send($recipient, $body, $originator = '', $user_ref = null)
     {
         if (null === $this->username || null === $this->password) {
-            throw new \RuntimeException('No API credentials provided');
+            throw new Exception\InvalidCredentialsException('No API credentials provided');
         }
 
         $params = $this->getParameters(array(
@@ -229,7 +229,7 @@ class CardboardfishProvider extends AbstractProvider
     {
         $result = trim($result);
 
-        $this->checkForError($result);
+        $this->checkForUnrecoverableError($result);
 
         return $this->checkForStatusResult($result);
     }
@@ -246,11 +246,10 @@ class CardboardfishProvider extends AbstractProvider
     {
         $result = trim($result);
 
-        try {
-            $this->checkForError($result);
-            $this->checkForOk($result);
-        } catch (Exception $e) {
-            return array_merge($this->getDefaults(), $extra_result_data, array('error' => $e->getMessage()));
+        $this->checkForUnrecoverableError($result);
+
+        if (!$this->isMessageSent($result)) {
+            return array_merge($this->getDefaults(), $extra_result_data);
         }
 
         // The message was successfully sent!
@@ -275,7 +274,7 @@ class CardboardfishProvider extends AbstractProvider
      * @param  string    $result The raw result string.
      * @throws Exception if error code found
      */
-    protected function checkForError($result)
+    protected function checkForUnrecoverableError($result)
     {
         if ('ERR' !== substr($result, 0, 3)) {
             return;
@@ -283,36 +282,34 @@ class CardboardfishProvider extends AbstractProvider
 
         switch ($result) {
             case 'ERR -5':
-                throw new Exception('Not Enough Credit');
+                throw new Exception\QuotaExceededException('Not Enough Credit');
                 break;
             case 'ERR -10':
-                throw new Exception('Invalid Username or Password');
+                throw new Exception\InvalidCredentialsException('Invalid Username or Password');
                 break;
             case 'ERR -15':
-                throw new Exception('Invalid destination or destination not covered');
+                throw new Exception\UnsupportedException('Invalid destination or destination not covered');
                 break;
             case 'ERR -20':
-                throw new Exception('System error, please retry');
+                throw new Exception\RuntimeException('System error, please retry');
                 break;
             case 'ERR -25':
-                throw new Exception('Request Error, Do Not Retry');
+                throw new Exception\RuntimeException('Request Error, Do Not Retry');
                 break;
             default:
-                throw new Exception('Unknown Error');
+                throw new Exception\RuntimeException('Unknown Error');
                 break;
         }
     }
 
     /**
      * @param  string    $result The raw result string.
-     * @throws Exception if error code found
+     *
+     * @return bool
      */
-    protected function checkForOk($result)
+    protected function isMessageSent($result)
     {
-        if ('OK' === substr($result, 0, 2)) {
-            return;
-        }
-        throw new Exception('Unknown Error');
+        return 'OK' === substr($result, 0, 2);
     }
 
     /**
