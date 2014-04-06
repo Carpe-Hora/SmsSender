@@ -80,7 +80,6 @@ class CardboardfishProvider extends AbstractProvider
             'SA' => $originator,
             'UR' => $user_ref,
             'M'  => $this->getMessage($body),
-            // 'M'  => urlencode(self::GSMEncode($body)),
         ));
         $extra_result_data = array(
             'recipient'  => $recipient,
@@ -545,3 +544,5 @@ class CardboardfishProvider extends AbstractProvider
         return $ret;
     }
 }
+
+// vim: set softtabstop=4 tabstop=4 shiftwidth=4 autoindent:

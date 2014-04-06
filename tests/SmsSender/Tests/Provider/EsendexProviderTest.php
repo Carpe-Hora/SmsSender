@@ -39,8 +39,8 @@ class EsendexProviderTest extends BaseProviderTest
      */
     public function testSend($send_to, $send_msg, $send_from, $api_response, $expected_result)
     {
-        $this->provider = new EsendexProvider($this->getMockAdapter(null, $api_response), 'username', 'pass', 'account');
-        $result = $this->provider->send($send_to, $send_msg, $send_from);
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_response));
+        $result = $provider->send($send_to, $send_msg, $send_from);
 
         $this->assertSame($expected_result['id'], $result['id']);
         $this->assertSame($expected_result['status'], $result['status']);

@@ -24,20 +24,20 @@ class NexmoProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \BadMethodCallException
      * @expectedExceptionMessage    The originator parameter is required for this provider.
      */
     public function testSendWithNoOriginator()
     {
         $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
-        $provider = new NexmoProvider($adapter, 'key', 'secret');
+        $provider = $this->getProvider($adapter);
         $provider->send('0642424242', 'foo!');
     }
 
     public function testSend()
     {
-        $this->provider = new NexmoProvider($this->getMockAdapter(), 'key', 'secret');
-        $result = $this->provider->send('0642424242', 'foo', 'originator');
+        $provider = $this->getProvider($this->getMockAdapter());
+        $result = $provider->send('0642424242', 'foo', 'originator');
 
         $this->assertNull($result['id']);
         $this->assertEquals(ResultInterface::STATUS_FAILED, $result['status']);
@@ -51,8 +51,8 @@ class NexmoProviderTest extends BaseProviderTest
         $data = <<<EOF
 {"message-count":"1","messages":[{"to":"33698568827","message-price":"0.04500000","status":"0","message-id":"0A130A1B","remaining-balance":"1.81000000"}]}
 EOF;
-        $this->provider = new NexmoProvider($this->getMockAdapter(null, $data), 'key', 'secret');
-        $result = $this->provider->send('0642424242', 'foo', 'originator');
+        $provider = $this->getProvider($this->getMockAdapter(null, $data));
+        $result = $provider->send('0642424242', 'foo', 'originator');
 
         $this->assertEquals('0A130A1B', $result['id']);
         $this->assertEquals(ResultInterface::STATUS_SENT, $result['status']);
@@ -122,7 +122,7 @@ EOF;
             );
 
         // setup the provider
-        $provider = new NexmoProvider($adapter, 'key', 'secret');
+        $provider = $this->getProvider($adapter);
 
         // launch the test
         $provider->send('0642424242', $body, 'originator');

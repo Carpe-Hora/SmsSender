@@ -60,7 +60,7 @@ class NexmoProvider extends AbstractProvider
         }
 
         if (empty($originator)) {
-            throw new \RuntimeException('The originator parameter is required for this provider.');
+            throw new \BadMethodCallException('The originator parameter is required for this provider.');
         }
 
         // clean the originator string to ensure that the sms won't be

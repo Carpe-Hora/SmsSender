@@ -25,7 +25,7 @@ class TwilioProviderTest extends BaseProviderTest
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \BadMethodCallException
      * @expectedExceptionMessage    The originator parameter is required for this provider.
      */
     public function testSendWithNoOriginator()
@@ -36,7 +36,7 @@ class TwilioProviderTest extends BaseProviderTest
 
     public function testSend()
     {
-        $provider = new TwilioProvider($this->getMockAdapter(), 'key', 'secret');
+        $provider = $this->getProvider($this->getMockAdapter());
         $result = $provider->send('0642424242', 'foo', 'originator');
 
         $this->assertNull($result['id']);
@@ -51,8 +51,8 @@ class TwilioProviderTest extends BaseProviderTest
         $data = <<<EOF
 {"sid":"SMfb01b1397d9b252ddd078351db17a814","date_created":"Mon, 02 Sep 2013 14:38:21 +0000","date_updated":"Mon, 02 Sep 2013 14:38:21 +0000","date_sent":null,"account_sid":"ACe2df2c142152c20224fbf059be28e7d7","to":"+642424242","from":"+15005550006","body":"foo","status":"queued","direction":"outbound-api","api_version":"2010-04-01","price":null,"price_unit":"USD","uri":"\/2010-04-01\/Accounts\/ACe2df2c142152c20224fbf059be28e7d7\/SMS\/Messages\/SMfb01b1397d9b252ddd078351db17a814.json"}
 EOF;
-        $this->provider = new TwilioProvider($this->getMockAdapter(null, $data), 'key', 'secret');
-        $result = $this->provider->send('0642424242', 'foo', '+15005550006');
+        $provider = $this->getProvider($this->getMockAdapter(null, $data));
+        $result = $provider->send('0642424242', 'foo', '+15005550006');
 
         $this->assertEquals('SMfb01b1397d9b252ddd078351db17a814', $result['id']);
         $this->assertEquals(ResultInterface::STATUS_SENT, $result['status']);

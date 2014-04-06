@@ -39,10 +39,9 @@ class CardboardfishProviderTest extends BaseProviderTest
      */
     public function testStatus($api_response, $expected_result)
     {
-        $this->provider = new CardboardfishProvider($this->getMockAdapter(null, $api_response), 'username', 'pass');
-        $result = $this->provider->getStatus();
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_response));
 
-        $this->assertEquals($expected_result, $result);
+        $this->assertEquals($expected_result, $provider->getStatus());
     }
 
     public function statusDataprovider()
@@ -99,17 +98,17 @@ class CardboardfishProviderTest extends BaseProviderTest
     public function testSendFail()
     {
         $api_response = 'asdfasdfasdf';
-        $this->provider = new CardboardfishProvider($this->getMockAdapter(null, $api_response), 'username', 'pass');
+        $this->provider = $this->getProvider($this->getMockAdapter(null, $api_response));
         $result = $this->provider->send('123', 'blabla', '456');
 
-        $expected_result = [
+        $expected_result = array(
             'id'         => null,
-            'status'     => 'failed',
+            'status'     => ResultInterface::STATUS_FAILED,
             'recipient'  => '123',
             'body'       => 'blabla',
             'originator' => '456',
             'error'      => 'Unknown Error',
-        ];
+        );
         $this->assertSame($expected_result, $result);
     }
 
@@ -118,7 +117,7 @@ class CardboardfishProviderTest extends BaseProviderTest
      */
     public function testSend($send_to, $send_msg, $send_from, $api_response, $expected_result)
     {
-        $this->provider = new CardboardfishProvider($this->getMockAdapter(null, $api_response), 'username', 'pass');
+        $this->provider = $this->getProvider($this->getMockAdapter(null, $api_response));
         $result = $this->provider->send($send_to, $send_msg, $send_from);
 
         $this->assertSame($expected_result['id'], $result['id']);
