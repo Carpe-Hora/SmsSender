@@ -14,7 +14,7 @@ class ValueFirstProviderTest extends TestCase
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
      */
     public function testSendWithNullApiCredentials()
@@ -25,37 +25,20 @@ class ValueFirstProviderTest extends TestCase
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException           \SmsSender\Exception\InvalidCredentialsException
      * @expectedExceptionMessage    No API credentials provided
-     *//*
+     */
     public function testGetStatusWithNullApiCredentials()
     {
         $adapter = $this->getMock('\SmsSender\HttpAdapter\HttpAdapterInterface');
         $provider = new ValueFirstProvider($adapter, null, null, null);
-        $provider->getStatus();
-    }*/
-
-    /**
-     * @dataProvider statusDataprovider
-     *//*
-    public function testStatus($api_response, $expected_result)
-    {
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_response), 'username', 'pass');
-        $result = $this->provider->getStatus();
-
-        $this->assertEquals($expected_result, $result);
-    }*/
-
-    public function statusDataprovider()
-    {
-        $status = array(
-            'id'            => null,
-            'status_info'   => null,
-        );
-
-        return array();
+        $provider->getStatus('dummyMessageId');
     }
 
+    /**
+     * @expectedExceptionMessage    The specified message does not conform to DTD
+     * @expectedException           \SmsSender\Exception\RuntimeException
+     */
     public function testGeneralError()
     {
         $api_data = <<<EOF
@@ -64,25 +47,8 @@ class ValueFirstProviderTest extends TestCase
     <Err Code="65535" Desc="The Specified message does not conform to DTD"/>
 </MESSAGEACK>
 EOF;
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->send('9191000000', 'foo', '9999');
-        $expected = array(
-            'id'         => null,
-            'status'     => ResultInterface::STATUS_FAILED,
-            'recipient'  => '9191000000',
-            'body'       => 'foo',
-            'originator' => '9999',
-            'error'      => 'The Specified message does not conform to DTD',
-            'error_code' => 65535,
-        );
-        $this->assertSame($expected['id'], $result['id']);
-        $this->assertSame($expected['status'], $result['status']);
-        $this->assertSame($expected['recipient'], $result['recipient']);
-        $this->assertSame($expected['body'], $result['body']);
-        $this->assertSame($expected['originator'], $result['originator']);
-        // fails... why?!
-        // $this->assertSame($expected['error'], $result['error']);
-        $this->assertSame($expected['error_code'], $result['error_code']);
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_data));
+        $provider->send('9191000000', 'foo', '9999');
     }
 
     public function testStatusCreditSuccess()
@@ -93,16 +59,20 @@ EOF;
     <Credit Limit="1000000" Used="4007.00"/>
 </SMS-Credit>
 EOF;
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->getCredit();
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_data));
         $expected = array(
             'user'  => 'foo',
             'limit' => 1000000,
             'used'  => 4007,
         );
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $provider->getCredit());
     }
 
+    /**
+     * @expectedExceptionMessage    Username / Password incorrect
+     * @expectedExceptionCode       52992
+     * @expectedException           \SmsSender\Exception\RuntimeException
+     */
     public function testStatusCreditWrongCredentials()
     {
         $api_data = <<<EOF
@@ -111,16 +81,15 @@ EOF;
     <Err Code="52992" Desc="UserName Password Incorrect"/>
 </SMS-Credit>
 EOF;
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->getCredit();
-        $expected = array(
-            'user'       => 'foo',
-            'error'      => 'Username / Password incorrect',
-            'error_code' => 52992,
-        );
-        $this->assertEquals($result, $expected);
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_data));
+        $provider->getCredit();
     }
 
+    /**
+     * @expectedExceptionMessage    GUID not found
+     * @expectedExceptionCode       -1
+     * @expectedException           \SmsSender\Exception\RuntimeException
+     */
     public function testStatusRequestNoExistingRef()
     {
         $api_data = <<<EOF
@@ -129,15 +98,8 @@ EOF;
     <GUID GUID="ke3rg342259821f440014czdy2RAPIDOSPOQ"></GUID>
 </STATUSACK>
 EOF;
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOQ');
-        $expected = array(
-            'id'            => 'ke3rg342259821f440014czdy2RAPIDOSPOQ',
-            'status'        => ResultInterface::STATUS_FAILED,
-            'status_code'   => -1,
-            'status_detail' => 'GUID not found',
-        );
-        $this->assertEquals($result, $expected);
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_data));
+        $provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOQ');
     }
 
     public function testStatusRequestSuccess()
@@ -150,29 +112,31 @@ EOF;
     </GUID>
 </STATUSACK>
 EOF;
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR');
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_data));
         $expected = array(
             'id'            => 'ke3rg342259821f440014czdy2RAPIDOSPOR',
             'status'        => ResultInterface::STATUS_SENT,
             'status_code'   => 8448,
             'status_detail' => 'Message delivered successfully',
         );
-        $this->assertEquals($result, $expected);
+        $this->assertEquals($expected, $provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR'));
     }
 
+    /**
+     * @expectedExceptionMessage    API response isn't a valid XML string
+     * @expectedException           \SmsSender\Exception\RuntimeException
+     */
     public function testStatusRequestFail()
     {
-        $api_data = '';
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR');
-        $expected = array(
-            'id'    => 'ke3rg342259821f440014czdy2RAPIDOSPOR',
-            'error' => 'response is not a valid XML string',
-        );
-        $this->assertEquals($result, $expected);
+        $provider = $this->getProvider($this->getMockAdapter(null, 'not xml'));
+        $provider->getStatus('ke3rg342259821f440014czdy2RAPIDOSPOR');
     }
 
+    /**
+     * @expectedExceptionMessage    Invalid Receiver ID (will validate Indian mobile numbers only.)
+     * @expectedExceptionCode       28682
+     * @expectedException           \SmsSender\Exception\RuntimeException
+     */
     public function testPostMessageError()
     {
         $api_data = <<<EOF
@@ -183,18 +147,8 @@ EOF;
     </GUID>
 </MESSAGEACK>
 EOF;
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_data), 'username', 'pass');
-        $result = $this->provider->send('9191000000', 'foo', '9999');
-        $expected = array(
-            'id'         => null,
-            'status'     => ResultInterface::STATUS_FAILED,
-            'recipient'  => '9191000000',
-            'body'       => 'foo',
-            'originator' => '9999',
-            'error'      => 'Invalid Receiver ID (will validate Indian mobile numbers only.)',
-            'error_code' => 28682,
-        );
-        $this->assertEquals($result, $expected);
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_data));
+        $provider->send('9191000000', 'foo', '9999');
     }
 
     /**
@@ -202,8 +156,8 @@ EOF;
      */
     public function testSend($send_to, $send_msg, $send_from, $api_response, $expected_result)
     {
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null, $api_response), 'username', 'pass');
-        $result = $this->provider->send($send_to, $send_msg, $send_from);
+        $provider = $this->getProvider($this->getMockAdapter(null, $api_response));
+        $result = $provider->send($send_to, $send_msg, $send_from);
 
         $this->assertSame($expected_result['id'], $result['id']);
         $this->assertSame($expected_result['status'], $result['status']);
@@ -242,17 +196,16 @@ EOF;
     }
 
     /**
-     * @dataProvider wrongNumberDataProvider
-     * @expectedException \RuntimeException
+     * @dataProvider        incorrectNumberProvider
+     * @expectedException   \SmsSender\Exception\InvalidPhoneNumberException
      */
-    /*
-    -- cannot get it to work?!
     public function testSendWrongNumberValidation($send_to, $send_msg)
     {
-        $this->provider = new ValueFirstProvider($this->getMockAdapter(null), 'username', 'pass');
-        $result = $this->provider->send($send_to, $send_msg, '999999');
+        $provider = $this->getProvider($this->getMockAdapter($this->never()));
+        $provider->send($send_to, $send_msg, '999999');
     }
-    public function wrongNumberDataProvider()
+
+    public function incorrectNumberProvider()
     {
         return array(
             array(null,         'foo'),
@@ -260,5 +213,4 @@ EOF;
             array('336666666',  'foo'),
         );
     }
-    */
 }

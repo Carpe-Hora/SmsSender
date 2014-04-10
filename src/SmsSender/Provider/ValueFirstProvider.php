@@ -10,9 +10,9 @@
 
 namespace SmsSender\Provider;
 
+use SmsSender\Exception as Exception;
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
-use Exception;
 
 /**
  * @author Kevin Saliou <kevin@saliou.name>
@@ -51,17 +51,14 @@ class ValueFirstProvider extends AbstractProvider
     }
 
     /**
-     * @param  string           $messageId
+     * @param  string $messageId
      * @return array
-     * @throws RuntimeException if no credentials provided
      */
     public function getStatus($messageId)
     {
-        if (null === $this->username || null === $this->password) {
-            throw new \RuntimeException('No API credentials provided');
-        }
+        $this->checkCredentials();
 
-        $xml = $this->getSrXml($messageId);
+        $xml = $this->buildGetStatusPayload($messageId);
         $res = $this->getAdapter()->getContent(
             self::SMS_STATUS_URL,
             'POST',
@@ -69,28 +66,24 @@ class ValueFirstProvider extends AbstractProvider
             array('action' => 'status', 'data' => $xml)
         );
 
-        return $this->parseStatusXml($res, $messageId);
+        return $this->parseStatusResponse($res, $messageId);
     }
 
     /**
      * @return array
-     * @throws RuntimeException if no credentials provided
      */
     public function getCredit()
     {
-        if (null === $this->username || null === $this->password) {
-            throw new \RuntimeException('No API credentials provided');
-        }
+        $this->checkCredentials();
 
-        $xml = $this->getCrXml();
         $res = $this->getAdapter()->getContent(
             self::SMS_STATUS_URL,
             'POST',
             $headers = array(),
-            array('action' => 'credits', 'data' => $xml)
+            array('action' => 'credits', 'data' => $this->buildGetCreditPayload())
         );
 
-        return $this->parseCreditXml($res);
+        return $this->parseCreditResponse($res);
     }
 
     /**
@@ -98,10 +91,7 @@ class ValueFirstProvider extends AbstractProvider
      */
     public function send($recipient, $body, $originator = '', $user_ref = null)
     {
-        if (null === $this->username || null === $this->password) {
-            throw new \RuntimeException('No API credentials provided');
-        }
-        $recipient = (int) $recipient;
+        $this->checkCredentials();
         $this->validateRecipient($recipient);
 
         $params = array(
@@ -114,9 +104,8 @@ class ValueFirstProvider extends AbstractProvider
         if (null !== $user_ref) {
             $params['TAG'] = $user_ref;
         }
-        $params = $this->getParameters($params);
 
-        $xml = $this->getSmsMtXml($params);
+        $xml = $this->buildSendSmsPayload($this->getParameters($params));
 
         return $this->executeQuery(self::SEND_SMS_URL, $xml, array(
             'recipient'  => $recipient,
@@ -147,7 +136,7 @@ class ValueFirstProvider extends AbstractProvider
             return array_merge($this->getDefaults(), $extra_result_data);
         }
 
-        return $this->parseResults($res, $extra_result_data);
+        return $this->parseSendResponse($res, $extra_result_data);
     }
 
     /**
@@ -156,7 +145,7 @@ class ValueFirstProvider extends AbstractProvider
      */
     protected function validateRecipient($recipient)
     {
-        $valid = array(
+        $validPrefixes = array(
             '9191',
             '9192',
             '9193',
@@ -166,8 +155,9 @@ class ValueFirstProvider extends AbstractProvider
             '9198',
             '9199',
         );
-        if (!in_array(substr($recipient, 0, 4), $valid)) {
-            throw new \Exception($recipient . ' is not a valid number');
+
+        if (!in_array(substr($recipient, 0, 4), $validPrefixes)) {
+            throw new Exception\InvalidPhoneNumberException($recipient . ' is not a valid number');
         }
     }
 
@@ -207,7 +197,7 @@ class ValueFirstProvider extends AbstractProvider
      * Constructs valid XML for sending SMS-CR credit request service
      * @return string
      */
-    protected function getCrXml()
+    protected function buildGetCreditPayload()
     {
         $xml = new \SimpleXMLElement(
             '<?xml version="1.0" encoding="ISO-8859-1"?>'.
@@ -226,7 +216,7 @@ class ValueFirstProvider extends AbstractProvider
      * @param  string $messageId
      * @return string
      */
-    protected function getSrXml($messageId)
+    protected function buildGetStatusPayload($messageId)
     {
         $xml = new \SimpleXMLElement(
             '<?xml version="1.0" encoding="ISO-8859-1"?>'.
@@ -249,7 +239,7 @@ class ValueFirstProvider extends AbstractProvider
      * @param  array  $data
      * @return string
      */
-    protected function getSmsMtXml(array $data = array())
+    protected function buildSendSmsPayload(array $data = array())
     {
         $xml = new \SimpleXMLElement(
             '<?xml version="1.0" encoding="ISO-8859-1"?>'.
@@ -258,20 +248,24 @@ class ValueFirstProvider extends AbstractProvider
         );
 
         $user = $xml->addChild('USER');
-        foreach (array('USERNAME', 'PASSWORD') as $k) {
-            if (isset($data[ $k ])) {
-                $user->addAttribute($k, $data[ $k ]);
+        foreach (array('USERNAME', 'PASSWORD') as $key) {
+            if (!isset($data[$key])) {
+                continue;
             }
+
+            $user->addAttribute($key, $data[$key]);
         }
 
         $sms = $xml->addChild('SMS');
-        foreach (array('UDH', 'CODING', 'PROPERTY', 'ID', 'TEXT', 'DLR', 'VALIDITY', 'SEND_ON') as $k) {
-            if (isset($data[ $k ])) {
-                if ('TEXT' === $k) {
-                    $sms->addAttribute($k, $this->encodeMessage($data[ $k ]));
-                } else {
-                    $sms->addAttribute($k, $data[ $k ]);
-                }
+        foreach (array('UDH', 'CODING', 'PROPERTY', 'ID', 'TEXT', 'DLR', 'VALIDITY', 'SEND_ON') as $key) {
+            if (!isset($data[$key])) {
+                continue;
+            }
+
+            if ('TEXT' === $key) {
+                $sms->addAttribute($key, $this->encodeMessage($data[$key]));
+            } else {
+                $sms->addAttribute($key, $data[$key]);
             }
         }
 
@@ -397,42 +391,28 @@ class ValueFirstProvider extends AbstractProvider
      * @return array
      * @throws Exception if error code found
      */
-    protected function parseResults($result, array $extra_result_data = array())
+    protected function parseSendResponse($result, array $extra_result_data = array())
     {
-        $result = trim($result);
-
         libxml_use_internal_errors(true);
-        if (false === $result = simplexml_load_string($result)) {
-            return array_merge($this->getDefaults(), $extra_result_data, array(
-                'error' => 'response is not a valid XML string',
-            ));
+        if (false === ($result = simplexml_load_string(trim($result)))) {
+            throw new Exception\RuntimeException('API response isn\'t a valid XML string');
         }
 
-        try {
-            $this->checkForError($result);
-        } catch (\Exception $e) {
-            return array_merge($this->getDefaults(), $extra_result_data, array(
-                'error' => $e->getMessage(),
-                'error_code' => $e->getCode()
-            ));
-        }
-        if (false !== $res = $this->checkForStatusResult($result)) {
-            return array_merge($this->getDefaults(), $extra_result_data, array(
-                'status_info' => $res
-            ));
+        if (null !== ($error = $this->checkForError($result))) {
+            throw $error;
         }
 
         // The message was successfully sent!
-        $sms_data = array(
-            'status' => ResultInterface::STATUS_SENT,
-            'id' => (string) $result->GUID['GUID']
-        );
-
-        return array_merge($this->getDefaults(), $extra_result_data, $sms_data);
+        return array_merge($this->getDefaults(), $extra_result_data, array(
+            'status'    => ResultInterface::STATUS_SENT,
+            'id'        => (string) $result->GUID['GUID']
+        ));
     }
 
     /**
      * @param SimpleXMLElement $result The raw result string.
+     *
+     * @return Exception\Exception
      */
     protected function checkForError(\SimpleXMLElement $result)
     {
@@ -443,8 +423,10 @@ class ValueFirstProvider extends AbstractProvider
         </MESSAGEACK>
         */
         if (0 !== $result->Err->count()) {
-            $this->getErrorMessage( (int) $result->Err['Code'] );
+            $code = (int) $result->Err['Code'];
+            throw new Exception\RuntimeException($this->getApiMessage($code), $code);
         }
+
         /* -- sample message post error --
         <?xml version="1.0" encoding="ISO-8859-1"?>
         <MESSAGEACK>
@@ -454,17 +436,17 @@ class ValueFirstProvider extends AbstractProvider
         </MESSAGEACK>
         */
         if (0 !== $result->GUID->ERROR->count()) {
-            $this->getErrorMessage( (int) $result->GUID->ERROR['CODE'] );
+            $code = (int) $result->GUID->ERROR['CODE'];
+            throw new Exception\RuntimeException($this->getApiMessage($code), $code);
         }
-
-        return;
     }
 
     /**
-     * @param  int       $code
-     * @throws Exception is error code found
+     * @param int $code
+     *
+     * @return string The message.
      */
-    protected function getErrorMessage($code)
+    protected function getApiMessage($code)
     {
         $errors = array(
             -1    => 'GUID not found',
@@ -506,24 +488,8 @@ class ValueFirstProvider extends AbstractProvider
             13574 => 'Invalid GUID for GUID search query',
             13575 => 'Invalid command action',
         );
-        if (isset($errors[ (int) $code ])) {
-            throw new Exception($errors[ (int) $code ], (int) $code);
-        }
 
-        throw new Exception('Unknown error code '.$code, (int) $code);
-    }
-
-    /**
-     * @param  string       $result
-     * @return string|false
-     */
-    protected function checkForStatusResult($result)
-    {
-        if ('0#' === $result) {
-            return 'no message in queue';
-        }
-
-        return false;
+        return !empty($errors[$code]) ? $errors[$code] : 'Unknown error code';
     }
 
     /**
@@ -531,7 +497,7 @@ class ValueFirstProvider extends AbstractProvider
      * @param  string $messageId
      * @return array
      */
-    protected function parseStatusXml($xml, $messageId)
+    protected function parseStatusResponse($xml, $messageId)
     {
         /*
         GUID
@@ -559,36 +525,33 @@ class ValueFirstProvider extends AbstractProvider
             ValueFirst will not charge any credits for such events.
         */
         libxml_use_internal_errors(true);
-        if (false === $result = simplexml_load_string($xml)) {
-            return array(
-                'id' => $messageId,
-                'error' => 'response is not a valid XML string',
-            );
+
+        if (false === ($result = simplexml_load_string($xml))) {
+            throw new Exception\RuntimeException('API response isn\'t a valid XML string');
         }
 
-        try {
-            if (0 === $result->GUID->STATUS->count()) {
-                $this->getErrorMessage(-1);
-            }
-            $this->getErrorMessage( (int) $result->GUID->STATUS['ERR'] );
-        } catch (\Exception $e) {
-            return array(
-                'id' => $messageId,
-                'status' => 8448 === (int) $e->getCode() || 13568 === (int) $e->getCode() ? ResultInterface::STATUS_SENT : ResultInterface::STATUS_FAILED,
-                'status_code' => (int) $e->getCode(),
-                'status_detail' => $e->getMessage(),
-            );
+        if (0 === $result->GUID->STATUS->count()) {
+            throw new Exception\RuntimeException($this->getApiMessage(-1), -1);
         }
+
+        $code = (int) $result->GUID->STATUS['ERR'];
+
+        return array(
+            'id'            => $messageId,
+            'status'        => 8448 === $code || 13568 === $code ? ResultInterface::STATUS_SENT : ResultInterface::STATUS_FAILED,
+            'status_code'   => $code,
+            'status_detail' => $this->getApiMessage($code),
+        );
     }
 
     /**
      * @param  string $xml
-     * @param  string $messageId
      * @return array
      */
-    protected function parseCreditXml($xml)
+    protected function parseCreditResponse($xml)
     {
         /*
+        // response sample
         <?xml version="1.0" encoding="ISO-8859-1"?>
         <SMS-Credit User="rapidosports">
             <Credit Limit="1000000" Used="4007.00"/>
@@ -596,33 +559,39 @@ class ValueFirstProvider extends AbstractProvider
          */
 
         /*
+        // error
         <?xml version="1.0" encoding="ISO-8859-1"?>
         <SMS-Credit User="rapidoports">
             <Err Code="52992" Desc="UserName Password Incorrect"/>
         </SMS-Credit>
          */
         libxml_use_internal_errors(true);
-        if (false === $result = simplexml_load_string($xml)) {
-            return array(
-                'error' => 'response is not a valid XML string',
-            );
+
+        if (false === ($result = simplexml_load_string($xml))) {
+            throw new Exception\RuntimeException('API response isn\'t a valid XML string');
         }
-        try {
-            if (0 !== $result->Err->count()) {
-                $this->getErrorMessage((int) $result->Err['Code']);
-            }
-        } catch (\Exception $e) {
-            return array(
-                'user' => (string) $result['User'],
-                'error' => $e->getMessage(),
-                'error_code' => $e->getCode(),
-            );
+
+        if (0 !== $result->Err->count()) {
+            $code = (int) $result->Err['Code'];
+
+            throw new Exception\RuntimeException($this->getApiMessage($code), $code);
         }
 
         return array(
-            'user' => (string) $result['User'],
+            'user'  => (string) $result['User'],
             'limit' => (int) $result->Credit['Limit'],
-            'used' => (int) $result->Credit['Used'],
+            'used'  => (int) $result->Credit['Used'],
         );
+    }
+
+    /**
+     * Checks that the needed credentials were given and raise an error if
+     * they weren't.
+     */
+    protected function checkCredentials()
+    {
+        if (null === $this->username || null === $this->password) {
+            throw new Exception\InvalidCredentialsException('No API credentials provided');
+        }
     }
 }
