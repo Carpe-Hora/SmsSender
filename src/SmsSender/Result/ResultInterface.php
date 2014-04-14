@@ -71,6 +71,13 @@ interface ResultInterface
     public function getOriginator();
 
     /**
+     * Returns the status of the sms.
+     *
+     * @return string
+     */
+    public function getStatus();
+
+    /**
      * Extracts data from an array.
      *
      * @param array $data An array.
