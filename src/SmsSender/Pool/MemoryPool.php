@@ -10,6 +10,7 @@
 
 namespace SmsSender\Pool;
 
+use SmsSender\Exception\Exception;
 use SmsSender\SmsSenderInterface;
 use SmsSender\Result\ResultInterface;
 
@@ -39,12 +40,17 @@ class MemoryPool implements PoolInterface
     public function flush(SmsSenderInterface $sender)
     {
         $results = array();
+        $errors = array();
 
         foreach ($this->messages as $message) {
-            $results[] = $sender->send($message['recipient'], $message['body'], $message['originator']);
+            try {
+                $results[] = $sender->send($message['recipient'], $message['body'], $message['originator']);
+            } catch (Exception $e) {
+                $errors[] = $e;
+            }
         }
 
-        return $results;
+        return array($results, $errors);
     }
 }
 

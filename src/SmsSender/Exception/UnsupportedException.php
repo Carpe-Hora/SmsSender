@@ -15,4 +15,13 @@ namespace SmsSender\Exception;
  */
 class UnsupportedException extends \InvalidArgumentException implements Exception
 {
+    public function serialize()
+    {
+        return serialize(array($this->message, $this->code));
+    }
+
+    public function unserialize($serialized)
+    {
+        list($this->message, $this->code) = unserialize($serialized);
+    }
 }

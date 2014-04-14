@@ -56,8 +56,9 @@ class MemoryPoolTest extends TestCase
         $pool->enQueue($secondMessage);
 
         // and flush it all!
-        $results = $pool->flush($sender);
+        list($messages, $errors) = $pool->flush($sender);
 
-        $this->assertSame(array('first', 'second'), $results);
+        $this->assertSame(array('first', 'second'), $messages);
+        $this->assertEmpty($errors);
     }
 }
