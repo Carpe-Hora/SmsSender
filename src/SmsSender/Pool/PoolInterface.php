@@ -29,6 +29,8 @@ interface PoolInterface
      * Sends all the messages contained in the pool.
      *
      * @param \SmsSender\SmsSenderInterface $sender The sender to use.
+     *
+     * @return array<array<ResultInterface>, array<Exception>> A list of sent messages and a list of errors.
      */
     public function flush(SmsSenderInterface $sender);
 }

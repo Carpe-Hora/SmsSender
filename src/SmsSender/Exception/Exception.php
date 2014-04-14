@@ -13,6 +13,6 @@ namespace SmsSender\Exception;
 /**
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
-interface Exception
+interface Exception extends \Serializable
 {
 }

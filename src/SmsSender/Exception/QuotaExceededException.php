@@ -15,4 +15,13 @@ namespace SmsSender\Exception;
  */
 class QuotaExceededException extends \RuntimeException implements Exception
 {
+    public function serialize()
+    {
+        return serialize(array($this->message, $this->code));
+    }
+
+    public function unserialize($serialized)
+    {
+        list($this->message, $this->code) = unserialize($serialized);
+    }
 }

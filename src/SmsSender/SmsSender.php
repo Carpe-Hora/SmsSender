@@ -10,6 +10,8 @@
 
 namespace SmsSender;
 
+use SmsSender\Exception\Exception;
+use SmsSender\Exception\WrappedException;
 use SmsSender\Provider\ProviderInterface;
 use SmsSender\Result\ResultInterface;
 use SmsSender\Result\Sms;
@@ -49,15 +51,18 @@ class SmsSender implements SmsSenderInterface
     {
         if (empty($recipient) || empty($body)) {
             // let's save a request
-            return $this->returnResult(array(
+            return $this->transformResult(array(
                 'status' => ResultInterface::STATUS_FAILED,
             ));
         }
 
-        $data   = $this->getProvider()->send($recipient, $body, $originator);
-        $result = $this->returnResult($data);
+        try {
+            $data = $this->getProvider()->send($recipient, $body, $originator);
+        } catch (Exception $e) {
+            throw new WrappedException($e, array('recipient' => $recipient, 'body' => $body, 'originator' => $originator));
+        }
 
-        return $result;
+        return $this->transformResult($data);
     }
 
     /**
@@ -137,7 +142,7 @@ class SmsSender implements SmsSenderInterface
      * @param  array                 $data An array of data.
      * @return \SmsSender\Result\Sms
      */
-    protected function returnResult(array $data = array())
+    protected function transformResult(array $data = array())
     {
         $result = new Sms();
         $result->fromArray($data);

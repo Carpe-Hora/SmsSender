@@ -303,7 +303,7 @@ class CardboardfishProvider extends AbstractProvider
     }
 
     /**
-     * @param  string    $result The raw result string.
+     * @param string $result The raw result string.
      *
      * @return bool
      */
