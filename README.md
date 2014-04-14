@@ -31,6 +31,7 @@ Currently, there are only four providers:
 * [Nexmo](http://www.nexmo.com/)
 * [Twilio](https://www.twilio.com/)
 * [CardBoardFish](http://www.cardboardfish.com/)
+* [ValueFirst](http://vfirst.com/) (only covering India's networks)
 
 Installation
 ------------
