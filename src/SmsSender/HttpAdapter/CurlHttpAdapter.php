@@ -18,7 +18,7 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
     /**
      * {@inheritDoc}
      */
-    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
+    public function getContent($url, $method = 'GET', array $headers = array(), $data = array())
     {
         if (!function_exists('curl_init')) {
             throw new \RuntimeException('cURL has to be enabled.');
@@ -34,7 +34,10 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
 
         // join the data
         if (!empty($data) && 'POST' === strtoupper($method)) {
-            curl_setopt($c, CURLOPT_POSTFIELDS, $this->encodePostData($data));
+            if (is_array($data)) {
+                $data = $this->encodePostData($data);
+            }
+            curl_setopt($c, CURLOPT_POSTFIELDS, $data);
         }
 
         // and add the headers

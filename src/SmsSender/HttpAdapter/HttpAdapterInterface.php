@@ -26,11 +26,14 @@ interface HttpAdapterInterface
      *                              'Content-type: text/plain',
      *                              'Content-length: 100'
      *                         )
-     * @param  array  $data    The data to send when doing non "get" requests.
+     * @param  mixed  $data    The data to send when doing non "get" requests.
+     *                         Gets sent as POST parameters if a key/value
+     *                         array is passed or as request body if a
+     *                         string is passed.
      *
      * @return string
      */
-    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array());
+    public function getContent($url, $method = 'GET', array $headers = array(), $data = array());
 
     /**
      * Returns the name of the HTTP Adapter.
