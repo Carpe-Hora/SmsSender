@@ -37,9 +37,11 @@ class BuzzHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
     /**
      * {@inheritDoc}
      */
-    public function getContent($url, $method = 'GET', array $headers = array(), array $data = array())
+    public function getContent($url, $method = 'GET', array $headers = array(), $data = array())
     {
-        $data = $this->encodePostData($data);
+        if (is_array($data)) {
+            $data = $this->encodePostData($data);
+        }
 
         try {
             $response = $this->browser->call($url, $method, $headers, $data);
@@ -47,7 +49,7 @@ class BuzzHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
             return null;
         }
 
-        return $response ? $response->getContent() : null;;
+        return $response ? $response->getContent() : null;
     }
 
     /**
