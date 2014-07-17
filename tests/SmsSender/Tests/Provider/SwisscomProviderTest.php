@@ -53,7 +53,7 @@ class SwisscomProviderTest extends BaseProviderTest
     public function testSendWithMockData()
     {
         $data = <<<EOF
-{ 
+{
 "outboundSMSMessageRequest": {
     "address": [
       "tel:+41originator"
@@ -103,7 +103,9 @@ EOF;
                 $this->anything(), // headers
                 $this->callback(function ($data) use ($expectedRecipient) {
                     $data = json_decode($data, true);
-                    $to = array_pop(explode(':', $data['outboundSMSMessageRequest']['address'][0]));
+                    $data = explode(':', $data['outboundSMSMessageRequest']['address'][0]);
+                    $to = array_pop($data);
+
                     return $to === $expectedRecipient;
                 })
             );
