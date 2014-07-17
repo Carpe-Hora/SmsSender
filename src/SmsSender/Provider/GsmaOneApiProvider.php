@@ -10,7 +10,6 @@
 
 namespace SmsSender\Provider;
 
-use SmsSender\Exception\InvalidCredentialsException;
 use SmsSender\Exception\InvalidArgumentException;
 use SmsSender\Result\ResultInterface;
 
@@ -20,15 +19,6 @@ use SmsSender\Result\ResultInterface;
  */
 abstract class GsmaOneApiProvider extends AbstractProvider
 {
-    /**
-     * gsma oneapi url
-     *
-     * the lone %s is set to the senderAddress as per spec.
-     * 
-     * @var string
-     */
-    protected $url = 'http://example.com/v1/smsmessaging/outbound/%s/requests';
-
     /**
      * {@inheritDoc}
      *
@@ -45,6 +35,16 @@ abstract class GsmaOneApiProvider extends AbstractProvider
     }
 
     /**
+     * gsma oneapi url
+     *
+     * Must contain an unique %s placeholder corresponding to the senderAddress
+     * (as specified in the specs).
+     *
+     * @return string
+     */
+    abstract protected function getEndPointUrl();
+
+    /**
      * {@inheritDoc}
      */
     public function send($recipient, $body, $originator = '')
@@ -52,56 +52,48 @@ abstract class GsmaOneApiProvider extends AbstractProvider
         if (empty($originator)) {
             throw new InvalidArgumentException('The originator parameter is required for this provider.');
         }
-        $url = sprintf(
-            $this->url,
-            urlencode(
-                'tel:'.
-                $this->localNumberToInternational(
-                    $originator,
-                    $this->international_prefix
-                )
-            )
-        );
+
+        $internationalOriginator = $this->localNumberToInternational($originator, $this->international_prefix);
+        $url = sprintf($this->getEndPointUrl(), urlencode('tel:' . $internationalOriginator));
+
         $data = array(
-            'to' => $this->localNumberToInternational($recipient, $this->international_prefix),
+            'to'   => $this->localNumberToInternational($recipient, $this->international_prefix),
             'text' => $body,
             'from' => $originator,
         );
+
         return $this->executeQuery($url, $data, array(
-            'recipient' => $recipient,
-            'body' => $body,
+            'recipient'  => $recipient,
+            'body'       => $body,
             'originator' => $originator,
         ));
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'gsmaoneapi';
-    }
-
-    /**
      * do the query
      */
-    protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
+    private function executeQuery($url, array $data = array(), array $extra_result_data = array())
     {
-        $request = new \stdClass;
-        $request->outboundSMSMessageRequest = new \stdClass;
-        $request->outboundSMSMessageRequest->address = array( sprintf('tel:%s', $data['to']) );
-        $request->outboundSMSMessageRequest->senderAddress = sprintf('tel:%s', $data['from']);
-        $request->outboundSMSMessageRequest->outboundSMSTextMessage = new \stdClass;
-        $request->outboundSMSMessageRequest->outboundSMSTextMessage->message = $data['text'];
-                
+        $request = array(
+            'outboundSMSMessageRequest' => array(
+                'address'                => array(sprintf('tel:%s', $data['to'])),
+                'senderAddress'          => sprintf('tel:%s', $data['from']),
+                'outboundSMSTextMessage' => array(
+                    'message' => $data['text']
+                ),
+            ),
+        );
+
         $content = $this->getAdapter()->getContent($url, 'POST', $this->getHeaders(), json_encode($request));
 
         if (null == $content) {
             $results = $this->getDefaults();
         }
+
         if (is_string($content)) {
             $content = json_decode($content, true);
             $results['id'] = $content['outboundSMSMessageRequest']['clientCorrelator'];
+
             switch ($content['outboundSMSMessageRequest']['deliveryInfoList']['deliveryInfo'][0]['deliveryStatus']) {
                 case 'DeliveredToNetwork':
                     $results['status'] = ResultInterface::STATUS_SENT;
@@ -116,7 +108,9 @@ abstract class GsmaOneApiProvider extends AbstractProvider
     }
 
     /**
-     * return headers for request
+     * Return headers for request
+     *
+     * @note Extension point.
      *
      * @return string[]
      */

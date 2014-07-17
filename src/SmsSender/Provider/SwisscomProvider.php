@@ -11,8 +11,6 @@
 namespace SmsSender\Provider;
 
 use SmsSender\Exception\InvalidCredentialsException;
-use SmsSender\Exception\InvalidArgumentException;
-use SmsSender\Result\ResultInterface;
 
 /**
  * @author Lucas Bickel <hairmare@purplehaze.ch>
@@ -23,7 +21,7 @@ class SwisscomProvider extends GsmaOneApiProvider
     /**
      * {@inheritDoc}
      *
-     * @param object $adapter   adapter
+     * @param object $adapter              adapter
      * @param string $client_id            API-key from developer.swisscom.com
      * @param string $international_prefix international prefix
      *
@@ -34,7 +32,14 @@ class SwisscomProvider extends GsmaOneApiProvider
         parent::__construct($adapter, $international_prefix);
 
         $this->client_id = $client_id;
-        $this->url = 'https://api.swisscom.com/v1/messaging/sms/outbound/%s/requests';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getEndPointUrl()
+    {
+        return 'https://api.swisscom.com/v1/messaging/sms/outbound/%s/requests';
     }
 
     /**
@@ -45,6 +50,7 @@ class SwisscomProvider extends GsmaOneApiProvider
         if (null == $this->client_id) {
             throw new InvalidCredentialsException('No API credentials provided');
         }
+
         return parent::send($recipient, $body, $originator);
     }
 
@@ -63,6 +69,7 @@ class SwisscomProvider extends GsmaOneApiProvider
     {
         $headers = parent::getHeaders();
         $headers[] = 'client_id: '.$this->client_id;
+
         return $headers;
     }
 }
