@@ -22,11 +22,6 @@ use SmsSender\Result\Sms;
 class SmsSender implements SmsSenderInterface
 {
     /**
-     * Version
-     */
-    const VERSION = '1.2.0-dev';
-
-    /**
      * @var array
      */
     protected $providers = array();
