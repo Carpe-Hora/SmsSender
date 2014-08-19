@@ -401,11 +401,11 @@ class CardboardfishProvider extends AbstractProvider
     protected function getMessage($message, $data_coding_scheme = null)
     {
         if (null === $data_coding_scheme || 1 === $data_coding_scheme) {
-            return urlencode(self::GSMEncode($message));
+            return self::GSMEncode($message);
         }
 
         if (0 === $data_coding_scheme) {
-            return urlencode(self::GSMEncode($message));
+            return self::GSMEncode($message);
         }
 
         return urlencode($message);
