@@ -70,12 +70,13 @@ class WebsmsProvider extends AbstractProvider
             throw new Exception\InvalidCredentialsException('No API credentials provided');
         }
 
-        $recipient = $this->localNumberToInternational($recipient, $this->internationalPrefix);
-        $recipient = $this->removeLeadingPlusIfPresent($recipient);
-
         $params = array(
             'messageContent' => $body,
-            'recipientAddressList' => array($recipient)
+            'recipientAddressList' => array(
+                $this->removeLeadingPlusIfPresent(
+                    $this->localNumberToInternational($recipient, $this->internationalPrefix)
+                )
+            )
         );
 
         return $this->executeQuery($this->getEndPointUrl(), $params, array(
