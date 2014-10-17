@@ -33,6 +33,7 @@ The following providers are supported:
 * [CardBoardFish](http://www.cardboardfish.com/)
 * [ValueFirst](http://vfirst.com/) (only covering India's networks)
 * [Swisscom](http://developer.swisscom.com/) (based on the [GSMA OneAPI](http://www.gsma.com/oneapi/) Specification)
+* [websms](https://websms.at/)
 
 Installation
 ------------
