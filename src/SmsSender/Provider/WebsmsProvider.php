@@ -30,6 +30,9 @@ class WebsmsProvider extends AbstractProvider
      */
     protected $accessToken;
 
+    /**
+     * @var string
+     */
     protected $internationalPrefix;
 
     /**
@@ -76,6 +79,14 @@ class WebsmsProvider extends AbstractProvider
         ));
     }
 
+    /**
+     * Issues the actual HTTP query.
+     *
+     * @param $url
+     * @param array $data
+     * @param array $extra_result_data
+     * @return array
+     */
     protected function executeQuery($url, array $data = array(), array $extra_result_data = array())
     {
         $headers = array(
@@ -83,6 +94,8 @@ class WebsmsProvider extends AbstractProvider
             'Content-Type: application/json',
             'Accept: application/json'
         );
+
+        // Issue the request
         $content = $this->getAdapter()->getContent($url, 'POST', $headers, json_encode($data));
 
         if (null === $content) {
@@ -93,7 +106,7 @@ class WebsmsProvider extends AbstractProvider
     }
 
     /**
-     * Parse the data returned by the API.
+     * Parses the data returned by the API.
      *
      * @param  string $result The raw result string.
      * @return array
@@ -103,7 +116,7 @@ class WebsmsProvider extends AbstractProvider
         $data = json_decode($result, true);
         $smsData = array();
 
-        // there was an error
+        // There was an error
         if (empty($data['transferId']) || empty($data['statusCode'])) {
             return array_merge($this->getDefaults(), $extra_result_data, array(
                     'status' => ResultInterface::STATUS_FAILED,
@@ -114,7 +127,7 @@ class WebsmsProvider extends AbstractProvider
         // Get the transfer id
         $smsData['id'] = $data['transferId'];
 
-        // get the status
+        // Get the status
         switch ($data['statusCode']) {
             case 2000:
                 $smsData['status'] = ResultInterface::STATUS_SENT;
@@ -130,6 +143,12 @@ class WebsmsProvider extends AbstractProvider
         return array_merge($this->getDefaults(), $extra_result_data, $smsData);
     }
 
+    /**
+     * Removes the leading plus sign from the international phone number as websms requires it that way.
+     *
+     * @param string $number The number to strip the plus sign from
+     * @return string
+     */
     protected function removeLeadingPlusIfPresent($number)
     {
         if ($number[0] !== '+') {
