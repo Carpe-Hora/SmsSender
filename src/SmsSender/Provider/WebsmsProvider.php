@@ -23,6 +23,11 @@ class WebsmsProvider extends AbstractProvider
     /**
      * @var string
      */
+    const ENDPOINT_URL = 'https://api.websms.com/rest/smsmessaging/text';
+
+    /**
+     * @var string
+     */
     protected $accessToken;
 
     protected $internationalPrefix;
@@ -44,14 +49,6 @@ class WebsmsProvider extends AbstractProvider
     public function getName()
     {
         return 'websms';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getEndPointUrl()
-    {
-        return 'https://api.websms.com/rest/smsmessaging/text';
     }
 
     /**
@@ -77,7 +74,7 @@ class WebsmsProvider extends AbstractProvider
             )
         );
 
-        return $this->executeQuery($this->getEndPointUrl(), $params, array(
+        return $this->executeQuery(self::ENDPOINT_URL, $params, array(
             'recipient'  => $recipient,
             'body'       => $body,
             'originator' => $originator,
