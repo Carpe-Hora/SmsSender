@@ -52,12 +52,7 @@ class WebsmsProvider extends AbstractProvider
     }
 
     /**
-     * Send a message to the given phone number.
-     *
-     * @param string $recipient  The phone number.
-     * @param string $body       The message to send.
-     * @param string $originator The name of the person which sends the message.
-     * @return array The data returned by the API.
+     * {@inheritDoc}
      */
     public function send($recipient, $body, $originator = '')
     {
