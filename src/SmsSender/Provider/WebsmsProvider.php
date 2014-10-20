@@ -15,8 +15,6 @@ use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
 
 /**
- *
- *
  * @author Thomas Konrad <tkonrad@gmx.net>
  * @see <https://websms.at/entwickler/sms-api/api-rest/rest-schnittstellenspezifikation>
  */
