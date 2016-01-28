@@ -12,12 +12,7 @@ namespace SmsSender\Provider;
 use SmsSender\Exception as Exception;
 use SmsSender\HttpAdapter\HttpAdapterInterface;
 use SmsSender\Result\ResultInterface;
-/**
- * Created by PhpStorm.
- * User: plato
- * Date: 2015/4/9
- * Time: 下午 01:58
- */
+
 class TwsmsProvider extends AbstractProvider
 {
     /**
