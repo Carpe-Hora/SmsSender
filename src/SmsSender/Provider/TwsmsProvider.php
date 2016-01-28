@@ -80,14 +80,13 @@ class TwsmsProvider extends AbstractProvider
             array(
                 'mobile' => $recipient,
                 'sendtime' => $sendtime,
-                'message' => $this->getMessage($body),
+                'message' => urlencode($body),
             )
         );
 
         $extra_result_data = array(
             'recipient' => $recipient,
             'body' => $body,
-
         );
 
         $res = $this->getAdapter()->getContent(self::SEND_SMS_URL, 'POST', $headers = array(), $params);
@@ -127,14 +126,14 @@ class TwsmsProvider extends AbstractProvider
                     'password' => $this->password,
                     /*
                      * -- sendtime
-                     * 格式：YYYYMMDDHHII （請使用 24 小時制）
-                     * 預約時間，例如 201504121830
+                     * Format: YYYYMMDDHHII (Please use the 24-hour clock)
+                     * Appointment, for example, 201504121830
                      */
                     'sendtime' => null,
                     /*
                      * -- expirytime
-                     *簡訊有效期限，單位為秒，範圍：300~86400 秒
-                     *例如: 86400 為 24 小時
+                     * SMS valid period, in seconds, range: 300~86400 seconds
+                     * For example: 86400 for 24 hours
                      */
                     'expirytime' => null,
                     /*
@@ -184,10 +183,9 @@ class TwsmsProvider extends AbstractProvider
      */
     protected function parseSendResults($result, array $extra_result_data = array())
     {
-
         $xml = simplexml_load_string($result);
 
-        if ($xml->code <> '00000') {
+        if ($xml->code != '00000') {
             return array_merge($this->getDefaults(), $extra_result_data);
         }
 
@@ -210,22 +208,22 @@ class TwsmsProvider extends AbstractProvider
         }
 
         $statuses = array(
-            1 => 'DELIVERED',
             // Message delivered to handset.
-            2 => 'BUFFERED',
+            1 => 'DELIVERED',
             // Message buffered, usually because it failed first time and is now being retried.
-            3 => 'FAILED',
+            2 => 'BUFFERED',
             // The message failed to deliver. The GSM error code may give more information.
-            5 => 'EXPIRED',
+            3 => 'FAILED',
             // Message expired, could not be delivered within the validity period.
-            6 => 'REJECTED',
+            5 => 'EXPIRED',
             // Message rejected by SMSC.
-            7 => 'ERROR',
+            6 => 'REJECTED',
             // SMSC error, message could not be processed this time.
-            11 => 'UNKNOWN',
+            7 => 'ERROR',
             // Unknown status, usually generated after 24 hours if no status has been returned from the SMSC.
-            12 => 'UNKNOWN',
+            11 => 'UNKNOWN',
             // Unknown status, SMSC returned a non standard status code.
+            12 => 'UNKNOWN',
         );
 
         $ret = array();
