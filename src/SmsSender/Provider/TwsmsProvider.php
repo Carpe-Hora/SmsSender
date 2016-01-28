@@ -286,14 +286,4 @@ class TwsmsProvider extends AbstractProvider
 
         return false;
     }
-
-    /**
-     * @param  string $message
-     * @param  int $data_coding_scheme
-     * @return string
-     */
-    protected function getMessage($message, $data_coding_scheme = null)
-    {
-        return urlencode($message);
-    }
 }
