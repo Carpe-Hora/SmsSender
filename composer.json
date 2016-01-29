@@ -23,6 +23,9 @@
         "ext-curl": "*"
     },
     "autoload": {
-        "psr-0": { "SmsSender": "src/" }
+        "psr-4": { "SmsSender\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "SmsSender\\Tests\\": "tests/" }
     }
 }
