@@ -1,7 +1,7 @@
 {
     "name": "Carpe-Hora/SmsSender",
     "type": "library",
-    "description": "The almost missing SMS sending PHP 5.3 library.",
+    "description": "The almost missing SMS sending PHP library.",
     "keywords": ["sms", "abstraction"],
     "homepage": "http://github.com/Carpe-Hora/SmsSender",
     "license": "MIT",
