@@ -9,6 +9,11 @@ really extensible.
 **N.B**: there is also a [bundle](https://github.com/K-Phoen/KPhoenSmsSenderBundle)
 integrating this library in Symfony2 applications.
 
+## Status
+
+This project is **DEPRECATED** and should NOT be used. 
+
+If someone magically appears and wants to maintain this project, I'll gladly give access to this repository.
 
 ### HttpAdapters ###
 
