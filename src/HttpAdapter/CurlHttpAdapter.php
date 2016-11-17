@@ -10,11 +10,18 @@
 
 namespace SmsSender\HttpAdapter;
 
+use SmsSender\Exception\AdapterException;
+
 /**
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
 class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterface
 {
+    /**
+     * @var array
+     */
+    protected $lastRequest;
+
     /**
      * {@inheritDoc}
      */
@@ -48,6 +55,19 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
         // execute the request
         $content = curl_exec($c);
 
+        $this->setLastRequest([
+            'url' => $url,
+            'method' => $method,
+            'headers' => $headers,
+            'data' => $data,
+        ]);
+
+        if(curl_errno($c)){
+            $adapterException = new AdapterException(curl_error($c), curl_errno($c));
+            $adapterException->setData(curl_getinfo($c));
+            curl_close($c);
+            throw $adapterException;
+        }
         curl_close($c);
 
         if (false === $content) {
@@ -63,6 +83,26 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
     public function getName()
     {
         return 'curl';
+    }
+
+    /**
+     * @param bool|false $string
+     *
+     * @return mixed|string
+     */
+    public function getLastRequest($string = false)
+    {
+        return ($string) ? json_encode($this->lastRequest) : $this->lastRequest;
+    }
+
+    /**
+     * Return last request as string or object
+     *
+     * @param array $lastRequest
+     */
+    protected function setLastRequest($lastRequest)
+    {
+        $this->lastRequest = $lastRequest;
     }
 }
 

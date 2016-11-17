@@ -41,6 +41,15 @@ interface HttpAdapterInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Return last request as string or object
+     *
+     * @param bool|false $string
+     *
+     * @return mixed|string
+     */
+    public function getLastRequest($string = false);
 }
 
 // vim: set softtabstop=4 tabstop=4 shiftwidth=4 autoindent:

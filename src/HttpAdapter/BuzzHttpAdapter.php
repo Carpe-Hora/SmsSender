@@ -11,6 +11,7 @@
 namespace SmsSender\HttpAdapter;
 
 use Buzz\Browser;
+use SmsSender\Exception\AdapterException;
 
 /**
  * @author Kévin Gomez <contact@kevingomez.fr>
@@ -44,12 +45,15 @@ class BuzzHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
         }
 
         try {
-            $response = $this->browser->call($url, $method, $headers, $data);
+            if($response = $this->browser->call($url, $method, $headers, $data)){
+                return $response->getContent();
+            }
         } catch (\Exception $e) {
-            return null;
+            if(!empty($e->getMessage())){
+                throw new AdapterException($e->getMessage(), $e->getCode(), $e);
+            }
         }
-
-        return $response ? $response->getContent() : null;
+        throw new AdapterException((string)$this->browser->getLastResponse(), ($this->browser->getLastResponse()) ? $this->browser->getLastResponse()->getStatusCode() : 0);
     }
 
     /**
@@ -58,6 +62,18 @@ class BuzzHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
     public function getName()
     {
         return 'buzz';
+    }
+
+    /**
+     * Return last request as string or object
+     *
+     * @param bool|false $string
+     *
+     * @return mixed|string
+     */
+    public function getLastRequest($string = false)
+    {
+        return ($string) ? (string)$this->browser->getLastRequest() : $string;
     }
 }
 
