@@ -16,6 +16,11 @@ namespace SmsSender\HttpAdapter;
 class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterface
 {
     /**
+     * @var array
+     */
+    protected $lastRequest;
+
+    /**
      * {@inheritDoc}
      */
     public function getContent($url, $method = 'GET', array $headers = array(), $data = array())
@@ -48,6 +53,13 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
         // execute the request
         $content = curl_exec($c);
 
+        $this->setLastRequest([
+            'url' => $url,
+            'method' => $method,
+            'headers' => $headers,
+            'data' => $data,
+        ]);
+
         curl_close($c);
 
         if (false === $content) {
@@ -63,6 +75,26 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
     public function getName()
     {
         return 'curl';
+    }
+
+    /**
+     * @param bool|false $string
+     *
+     * @return mixed|string
+     */
+    public function getLastRequest($string = false)
+    {
+        return ($string) ? json_encode($this->lastRequest) : $this->lastRequest;
+    }
+
+    /**
+     * Return last request as string or object
+     *
+     * @param array $lastRequest
+     */
+    protected function setLastRequest($lastRequest)
+    {
+        $this->lastRequest = $lastRequest;
     }
 }
 
