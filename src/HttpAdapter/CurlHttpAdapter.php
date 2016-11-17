@@ -10,6 +10,8 @@
 
 namespace SmsSender\HttpAdapter;
 
+use SmsSender\Exception\AdapterException;
+
 /**
  * @author Kévin Gomez <contact@kevingomez.fr>
  */
@@ -60,6 +62,12 @@ class CurlHttpAdapter extends AbstractHttpAdapter implements HttpAdapterInterfac
             'data' => $data,
         ]);
 
+        if(curl_errno($c)){
+            $adapterException = new AdapterException(curl_error($c), curl_errno($c));
+            $adapterException->setData(curl_getinfo($c));
+            curl_close($c);
+            throw $adapterException;
+        }
         curl_close($c);
 
         if (false === $content) {
