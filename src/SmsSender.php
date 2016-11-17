@@ -11,9 +11,9 @@
 namespace SmsSender;
 
 use SmsSender\Exception\Exception;
+use SmsSender\Exception\InvalidCredentialsException;
 use SmsSender\Exception\WrappedException;
 use SmsSender\Provider\ProviderInterface;
-use SmsSender\Result\ResultInterface;
 use SmsSender\Result\Sms;
 
 /**
@@ -45,10 +45,7 @@ class SmsSender implements SmsSenderInterface
     public function send($recipient, $body, $originator = '')
     {
         if (empty($recipient) || empty($body)) {
-            // let's save a request
-            return $this->transformResult(array(
-                'status' => ResultInterface::STATUS_FAILED,
-            ));
+            throw new InvalidCredentialsException('Empty recipient or body');
         }
 
         try {
